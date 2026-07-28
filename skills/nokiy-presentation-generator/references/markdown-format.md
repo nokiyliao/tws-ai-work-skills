@@ -71,7 +71,7 @@ Equipment comparison deck:
 ## Writing Rules
 
 - Titles should be short viewing instructions:
-  `通道先量`, not `AGV 車型評估與現場適用條件`.
+  `量測通道`, not `AGV 車型評估與現場適用條件`.
 - Keep Chinese titles short; if the title needs commas, slash marks, or more
   than one phrase, move detail to a note, appendix, or another slide.
 - Bullets should be factual and concise.

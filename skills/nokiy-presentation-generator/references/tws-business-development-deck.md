@@ -13,7 +13,7 @@ automation, logistics improvement, integrated proposal).
 - Visual pattern
 - Validation
 
-Asset paths referenced below (v0.7 master direction, service-scope overlay set,
+Asset paths referenced below (v0.8 authoritative global image, v0.7 editable overlay set,
 logos) are all defined in `assets-manifest.md`. Governance and copy/numeric
 discipline are in `shared-governance.md` + `../data/banned_terms.json`.
 
@@ -88,23 +88,24 @@ decision — not to be told who they are.
    phrased as `常見` / `容易`, never `貴司一定有`.
 5. TWS company role — integrated partner since 1980; concise, not a history
    deck.
-6. TWS service and equipment modules — reuse the v0.7 overlay master (slide 1
-   for most proposals, slide 2 for full range, slide 3 as no-text base; paths
-   in `assets-manifest.md`). Keep labels/leader lines/brands editable. Six
+6. TWS service and equipment modules — use the v0.8 authoritative global image
+   for complete-scope views. Use the v0.7 overlay master only when editable
+   labels or a customer-specific subset is required (paths in
+   `assets-manifest.md`). Keep added labels/leader lines editable. Six
    module families in business language: `運搬與車隊`, `垂直倉儲`,
    `月台與裝卸`, `料架與儲位`, `自動化與密集庫`, `清潔、系統與維運`. Lead with
    the corrected product lines (Toyota MH group, Modula, MBB, Galaxis, AiTEN,
    Geek+, racks, FastLINK, LionsBot); explain the operating issue each module
    helps with, no catalog dumping or hard performance claims.
 7. Integrated TWS logistics map — five layers `進出貨 / 儲存 / 搬運 / 系統 /
-   維運`; caption `先看整張地圖，再決定要先動哪一塊。`
+   維運`; caption `整張物流地圖可用來確認優先處理區域。`
 8. Low-pressure conversation path — `第一次交流` → `第二步盤點` → `後續方案`;
-   reassurance `現在先聊，不代表立刻採購。`
+   reassurance `本次交流不涉及採購決定。`
 9. TWS capability proof — concise: since 1980, thousands of customers,
    planning + equipment + automation + software + installation + training +
    maintenance.
 10. Next step — 30–60 minute discussion; headline
-   `先不用決定設備，只需要一起確認新廠物流現場的基本輪廓。`; technical details
+   `本次會議確認新廠物流現場的基本輪廓。`; technical details
    as `會議可一起確認`.
 
 ## Module Selection Heuristics
@@ -126,13 +127,13 @@ decision — not to be told who they are.
 
 Preferred phrasings:
 
-- `依目前公開資料與建廠線索，TWS 建議先從以下方向確認。`
-- `初步觀察：本案的價值不在單一設備，而在新廠投產前把儲位、動線、設備與系統一次對齊。`
+- `依目前公開資料與建廠線索，TWS 建議確認以下方向。`
+- `初步觀察：新廠投產前需確認儲位、動線、設備與系統的銜接條件。`
 - `會議確認項目：棧板尺寸、日出入庫量、SKU 數、梁下淨高、地坪荷重、投產時程。`
 - `建議下一步：以 30-60 分鐘會議完成作業輪廓盤點，再判斷是否需要圖面配置或現場勘查。`
-- `我們先從交流開始，不急著談設備清單。` / `先聊，不代表立刻採購。`
+- `本次交流不涉及設備清單或採購決定。`
 - `新廠投產前，倉儲物流規劃越早對齊，後續返工機率越低。`
-- `本階段先做狀態回報，不更換既有系統。`
+- `本階段提供狀態回報，不更換既有系統。`
 - `完成現場條件確認後，TWS 可提供配置圖、動線初評與預算估算。`
 
 Banned/discouraged terms are machine-readable in `../data/banned_terms.json`
@@ -146,6 +147,10 @@ internal documents.
   style rules in `shared-governance.md`. Default generated visuals should use
   the low-realism flat illustration style so they sit naturally beside editable
   system maps and process diagrams.
+- The cover is the only customer-specific generated image by default. Reuse
+  the approved shared factory material-flow image and the v0.8 authoritative
+  TWS global image on interior slides. Do not regenerate common interior
+  logistics scenes per prospect.
 - One short title per slide; prefer system maps, timelines, flows, before/after
   views, and equipment visuals. Keep labels editable and short.
 - Prefer fewer, clearer modules over complete coverage. If a slide starts to

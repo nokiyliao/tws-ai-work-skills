@@ -616,6 +616,12 @@ def main() -> int:
                         f"({ratio:.0%} of smaller object)")
 
         full_text = "\n".join(slide_text_parts)
+        notes_text = ""
+        if getattr(slide, "has_notes_slide", False):
+            notes_frame = getattr(slide.notes_slide, "notes_text_frame", None)
+            if notes_frame is not None:
+                notes_text = notes_frame.text or ""
+        copy_review_text = "\n".join(part for part in (full_text, notes_text) if part)
         if slide_body_units > max_slide_body_units:
             copy_discouraged_hits.append(
                 f"slide {idx}: body copy density {slide_body_units:.0f} units exceeds {max_slide_body_units:.0f}; replace prose with a visual or split the slide"
@@ -627,14 +633,16 @@ def main() -> int:
             if term_hits(full_text, t):
                 discouraged_hits.append(f"slide {idx}: discouraged 「{t}」")
         for t in banned_fluff_terms:
-            if term_hits(full_text, t):
-                copy_banned_hits.append(f"slide {idx}: fluff 「{t}」")
+            if term_hits(copy_review_text, t):
+                location = "visible copy / notes" if term_hits(notes_text, t) else "visible copy"
+                copy_banned_hits.append(f"slide {idx}: fluff in {location} 「{t}」")
         for t in discouraged_fluff_terms:
             if term_hits(full_text, t):
                 copy_discouraged_hits.append(f"slide {idx}: copy smell 「{t}」")
         for pattern in copy_rules.get("weak_copy_patterns", []):
-            if re.search(pattern, full_text):
-                weak_copy_pattern_hits.append(f"slide {idx}: weak copy pattern /{pattern}/")
+            if re.search(pattern, copy_review_text):
+                location = "visible copy / notes" if re.search(pattern, notes_text) else "visible copy"
+                weak_copy_pattern_hits.append(f"slide {idx}: weak copy pattern in {location} /{pattern}/")
 
     if args.ocr_rendered:
         if not args.rendered_dir:

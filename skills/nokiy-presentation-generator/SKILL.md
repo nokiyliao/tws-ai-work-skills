@@ -67,6 +67,11 @@ Read only what the task needs:
    or the private build note.
    The deck should read like a finished proposal, not a scaffold. Run the
    Humanizer pass before layout and treat the accepted copy as locked input.
+   Reject formulaic AI sentence frames in both visible copy and speaker notes,
+   including title phrasing built on `先＋動作`, `先……再……`, `不是……而是……`,
+   `不在……而在……`, `並非……而是……`, `不只是……而是……`, `不只……`,
+   `不僅……而且……`, and `真正的……`. State the condition, action, evidence,
+   or result directly.
    Preserve exact user-locked wording, numbers, units, names, model numbers,
    technical terms, quotations, and citations. For patch revisions, review
    only changed or newly created text; do not rewrite untouched approved slides.
@@ -131,7 +136,7 @@ Read `references/markdown-format.md` first for nontrivial decks.
   background, TWS dark green/charcoal text, one warm accent, white cards,
   hairline borders, large numbers.
 - Titles are short viewing instructions, not report headings. Prefer 4–12
-  Chinese characters: `包裝先穩`, `棧板先定位`, `通道先量`. Avoid long claims,
+  Chinese characters: `確認包裝條件`, `棧板定位`, `量測通道`. Avoid `先＋動作`, long claims,
   slogans, and sentences joined by `、` or `｜`.
 - Protect the title/subtitle zone: body content starts at the y returned by
   `add_slide()`. Align card tops on one baseline; shorten copy or move the
@@ -151,14 +156,23 @@ Read `references/markdown-format.md` first for nontrivial decks.
   beat generated art. Hero/cover and Image 2.0 style rules are in
   `shared-governance.md`; default generated visuals are low-realism flat
   business illustrations, not photorealistic warehouse scenes.
+- For new-factory proposals, customer-specific generation is limited to the
+  cover by default. Interior workflow visuals must come from the shared asset
+  catalog in `assets-manifest.md`; missing required assets block the build and
+  must not trigger a silent fallback.
 - Cards only for repeated items, metrics, comparisons, or capability maps.
-- For the TWS service-scope page, reuse the v0.7 overlay master (see
-  `assets-manifest.md`); keep labels and leader lines editable.
+- For a complete TWS service-scope page, use the user-approved v0.8
+  authoritative global image in `assets-manifest.md`. Use the v0.7 overlay
+  master only when editable labels or a customer-specific subset is required;
+  keep added labels and leader lines editable.
 - Lead with the user-corrected product lines when products are named: Toyota
   Material Handling group brands, Modula, MBB, Galaxis, AiTEN, Geek+, rack
   systems, FastLINK, LionsBot.
 - Copy and numeric-claim discipline: `shared-governance.md` +
   `data/banned_terms.json` + `data/copy_rules.json`.
+- Formulaic contrast/reveal structures listed in `customer-copy.md` are hard
+  failures under `--strict-copy`; this includes sentence variants in visible
+  copy and speaker notes.
 - Never call `add_image()` with both width and height. Use
   `add_image_contain()`/`add_logo()` so logos and product images cannot be
   stretched or cropped accidentally. Fixed-height helpers raise when copy

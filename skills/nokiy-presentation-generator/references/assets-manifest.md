@@ -18,7 +18,22 @@ Choose three local roots before the first run:
 - `<project-root>`: active customer or business-development projects.
 - `<output-root>`: temporary renders, QA files, and final deliverables.
 
-## TWS Service-Scope Asset Set (current: v0.7)
+## TWS Service-Scope Asset Set (current authority: v0.8)
+
+Bundled with this skill:
+
+- Authoritative TWS full-service global image:
+  `../assets/TWS_service_scope_authoritative_global_v0.8.png`
+- Shared new-factory material-flow illustration:
+  `../assets/TWS_shared_new_factory_material_flow_v1.png`
+- Shared asset catalog and selection policy: `../assets/catalog.json`
+
+The user-approved v0.8 image is the visual authority whenever a slide presents
+TWS's complete solution range. Do not regenerate, reinterpret, or silently
+substitute another overview. Copy selected bundled assets into each deck's
+local `assets/` folder before building the PPTX.
+
+Optional editable overlay set (current: v0.7):
 
 Base folder: `<company-data-root>/presentation-assets/tws-scope/`
 
@@ -31,8 +46,8 @@ Base folder: `<company-data-root>/presentation-assets/tws-scope/`
   `TWS_service_scope_editable_overlay_master_v0.7_labels.json`
 - PDF preview: `TWS_service_scope_editable_overlay_master_v0.7.pdf`
 
-Older versions (v0.2–v0.6) remain in the same folder for reference only; do not
-use them by default.
+Older versions (v0.2–v0.7) remain in the external folder for reference and
+editable overlay use; do not use them as the default full-range overview.
 
 Keep the background as raster; labels, leader lines, brand names, and promise
 boundaries must stay editable native PPTX objects (except for explicitly
@@ -69,6 +84,12 @@ them into generated backgrounds when the user may need manual adjustment.
   (`~/.codex/generated_images/<thread-id>/`).
 - Always copy the chosen image into the customer deck `assets/` folder before
   referencing it in a build script.
+- For new-factory decks, generate only the customer-specific cover by default.
+  Interior workflow and service-scope pages must query `../assets/catalog.json`
+  first. Generate a new interior visual only when the catalog has no suitable
+  asset and the gap is recorded in the build note.
+- Missing required library assets are blocking errors. Never silently replace
+  them with a photo, an older version, or unrelated generated art.
 - Record final generated/user/official images in `assets/registry.json` using
   `~/.codex/skills/nokiy-presentation-generator/data/asset_registry.schema.json`.
 - Allowed final uses: de-identified cover/chapter backgrounds, workflow or

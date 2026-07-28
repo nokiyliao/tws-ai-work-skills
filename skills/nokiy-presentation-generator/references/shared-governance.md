@@ -218,7 +218,7 @@ proposal. Before building the PPTX, run a copy pass:
 - Do not write long title strings joined by `、` or `｜`. If a title needs more
   than one breath, split the slide or move detail into the subtitle.
 - Prefer short labels over customer-visible outcome sentences:
-  `通道先量` beats `AGV 車型評估與現場適用條件`;
+  `量測通道` beats `AGV 車型評估與現場適用條件`;
   `庫存｜任務｜設備` beats `WMS 作業可視化底層建置`.
 - Body copy should be optional. If the visual is clear without the sentence,
   delete the sentence. Never use text to explain an arrow that can be drawn

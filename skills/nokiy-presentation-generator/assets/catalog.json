@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "policy": {
+    "customer_specific_generation": ["cover"],
+    "reuse_library_first": ["material_flow", "service_scope", "system_boundary", "engagement_flow"],
+    "missing_required_asset": "stop_and_report",
+    "silent_fallback": false
+  },
+  "assets": [
+    {
+      "id": "tws-authoritative-service-scope-v0.8",
+      "path": "TWS_service_scope_authoritative_global_v0.8.png",
+      "role": "service_scope",
+      "authority": "user-approved",
+      "reuse": "required_default",
+      "sha1": "16d03eb4a46c7fa9fb4da21a9e372afeaec65943"
+    },
+    {
+      "id": "tws-shared-new-factory-material-flow-v1",
+      "path": "TWS_shared_new_factory_material_flow_v1.png",
+      "role": "material_flow",
+      "authority": "approved_generated_library",
+      "reuse": "default",
+      "sha1": "c8707a8f22964454d4f71f900026969bd9fd3a53"
+    }
+  ]
+}

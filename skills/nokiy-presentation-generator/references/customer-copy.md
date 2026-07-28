@@ -33,13 +33,13 @@ Keep the labels editable. Do not explain each arrow in a paragraph.
 
 Use the shortest natural phrase that tells the room what to look at:
 
-- `包裝先穩`
-- `棧板先定位`
-- `通道先量`
-- `先看庫存`
+- `確認包裝條件`
+- `棧板定位`
+- `量測通道`
+- `查看庫存`
 - `產品決定乾燥`
-- `先做狀態回報`
-- `先確認載重`
+- `設備狀態回報`
+- `確認載重`
 
 Avoid topic labels such as `設備選型方向`, `WMS 架構`, `改善主軸`, or
 `乾燥設備比較分析`. Avoid slogans and sentences that sound like a report
@@ -68,12 +68,32 @@ Delete these openings and endings unless they are part of a direct quotation:
 - `打造…` / `實現…` / `全面…` / `全方位…`
 - `一站式解決方案` / `智慧化升級` / `數位轉型`
 
+The following formulaic contrast and reveal structures are prohibited in
+customer-visible copy and speaker notes:
+
+- `先……再……`
+- 標題中的 `先＋動作`，例如 `物料流先走一遍`、`通道先量`
+- `不是……而是……` / `不在……而在……` / `並非……而是……`
+- `不只是……而是……`
+- `不只……` / `不僅……而且……`
+- `真正的……` / `真正的重點是……`
+
+Rewrite them as a direct observation, condition, action, or result. Do not
+replace one prohibited formula with another:
+
+- `先確認流量，再決定設備` → `設備配置取決於日流量與尖峰量。`
+- `物料流先走一遍` → `盤點當前物料流`
+- `系統先留好接口` → `確認系統接口`
+- `這不是設備問題，而是流程問題` → `目前瓶頸在補料流程。`
+- `不只提升效率，也能降低錯誤` → `揀貨時間與錯誤件數可分別追蹤。`
+- `真正的價值是資料透明` → `管理者可查看庫存與任務狀態。`
+
 Replace the sentence with the visible action or object:
 
 - `透過系統整合提升管理效率` → `庫存、任務、設備`
 - `建立完整的物流改善方案` → `儲位 → 搬運 → 回報`
-- `以自動化為核心提升作業效能` → `先做固定路線搬運`
-- `AGV 車型評估與現場適用條件` → `通道先量`
+- `以自動化為核心提升作業效能` → `固定路線搬運`
+- `AGV 車型評估與現場適用條件` → `量測通道`
 
 ## Speaker Test
 
