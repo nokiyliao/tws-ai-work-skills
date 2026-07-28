@@ -1,0 +1,4 @@
+interface:
+  display_name: "Nokiy Deck Orchestrator"
+  short_description: "整合文案審查、可編輯簡報、視覺驗收與 PDF 流程"
+  default_prompt: "Use $nokiy-deck-orchestrator to create or revise a polished editable presentation with mandatory copy and visual QA."

@@ -1,0 +1,14 @@
+{
+  "name": "TWS AI Work Skills",
+  "version": "2026.07.28",
+  "skills": [
+    "skills/tws-customer-proposal-pipeline",
+    "skills/nokiy-presentation-generator",
+    "skills/nokiy-deck-orchestrator"
+  ],
+  "excludedUntilValidated": [
+    "CAD drafting",
+    "rack layout",
+    "engineering drawings"
+  ]
+}

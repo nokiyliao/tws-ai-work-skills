@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TWS deck asset registry",
+  "type": "object",
+  "required": ["assets"],
+  "properties": {
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["deck_asset_path", "source_type", "role"],
+        "properties": {
+          "deck_asset_path": { "type": "string", "minLength": 1 },
+          "original_path": { "type": "string" },
+          "source_type": {
+            "type": "string",
+            "enum": ["user", "official", "local_authority", "generated", "unknown"]
+          },
+          "authority": { "type": "string" },
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "examples": ["hero", "concept", "workflow", "logo", "product_proof", "equipment_selection"]
+          },
+          "allowed_use": {
+            "oneOf": [
+              { "type": "string" },
+              { "type": "array", "items": { "type": "string" } }
+            ]
+          },
+          "sha1": { "type": "string", "pattern": "^[0-9a-fA-F]{40}$" },
+          "prompt": { "type": "string", "minLength": 1 },
+          "width": { "type": "integer" },
+          "height": { "type": "integer" },
+          "notes": { "type": "string" }
+        },
+        "additionalProperties": true,
+        "allOf": [
+          {
+            "if": { "properties": { "source_type": { "const": "generated" } } },
+            "then": { "required": ["prompt"] }
+          }
+        ]
+      }
+    }
+  },
+  "additionalProperties": true
+}
