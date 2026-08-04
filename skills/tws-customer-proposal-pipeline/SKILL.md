@@ -20,11 +20,11 @@ Read only the relevant file(s):
 - `references/deck-production-qa.md` — production handoff, output paths, QA
   execution, failure handling.
 - Customer-facing copy method:
-  `~/.codex/skills/nokiy-presentation-generator/references/customer-copy.md`
+  `/Users/nokiy/.codex/skills/nokiy-presentation-generator/references/customer-copy.md`
   — use before writing visible slide copy.
 - Governance (authority order, deletion rule, locked assets, hero images, copy
   and numeric discipline, QA gates) is canonical in
-  `~/.codex/skills/nokiy-presentation-generator/references/shared-governance.md`
+  `/Users/nokiy/.codex/skills/nokiy-presentation-generator/references/shared-governance.md`
   — follow it for every customer-facing deck.
 
 ## Workflow
@@ -76,7 +76,7 @@ site / dock / ESG module as applicable.  11. Traceability and tracking frame.
 
 Detailed structures per mode (8–10 slide cold development, 12-slide
 improvement) live in
-`~/.codex/skills/nokiy-presentation-generator/references/tws-business-development-deck.md`.
+`/Users/nokiy/.codex/skills/nokiy-presentation-generator/references/tws-business-development-deck.md`.
 
 User-provided Markdown specs are contracts; deletion is authoritative
 (`shared-governance.md`).

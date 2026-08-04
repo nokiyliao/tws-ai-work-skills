@@ -3,9 +3,9 @@
 Production handoff details for this pipeline. Canonical governance (authority
 order, locked assets, hero-image rules, copy discipline, QA gate definitions)
 lives in
-`~/.codex/skills/nokiy-presentation-generator/references/shared-governance.md`.
+`/Users/nokiy/.codex/skills/nokiy-presentation-generator/references/shared-governance.md`.
 All asset and output paths live in
-`~/.codex/skills/nokiy-presentation-generator/references/assets-manifest.md`.
+`/Users/nokiy/.codex/skills/nokiy-presentation-generator/references/assets-manifest.md`.
 Do not restate either here.
 
 ## Skill Coordination
@@ -30,7 +30,7 @@ Run the mechanical gate first, on the final file:
 
 ```bash
 PATH="$HOME/.local/bin:$PATH" uv run --with python-pptx python \
-  ~/.codex/skills/nokiy-presentation-generator/scripts/qa_check.py \
+  /Users/nokiy/.codex/skills/nokiy-presentation-generator/scripts/qa_check.py \
   <final>.pptx --mode customer_facing --expect-slides <N> \
   --strict-zone --strict-overlap --strict-discouraged --strict-copy --min-font 10 \
   --build-note <scratch>/build_note.md \

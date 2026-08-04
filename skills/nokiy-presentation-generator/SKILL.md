@@ -26,7 +26,7 @@ Read only what the task needs:
 - `references/customer-copy.md` — concise customer-facing copy method, title
   budgets, visual-first page structure, short labels, and AI-style sentence
   shapes to remove.
-- `~/.codex/skills/humanizer-zh-tw/SKILL.md` — mandatory review for
+- `/Users/nokiy/.codex/skills/humanizer-zh-tw/SKILL.md` — mandatory review for
   every newly authored or changed customer-visible line and speaker note.
 - `data/banned_terms.json` — mode-keyed banned/discouraged terms (shared with
   `scripts/qa_check.py`).
@@ -58,7 +58,7 @@ Read only what the task needs:
    route to `tws-customer-proposal-pipeline` first.
 2. Classify revision/build mode and scope per `shared-governance.md`.
 3. Read `references/customer-copy.md` and
-   `~/.codex/skills/humanizer-zh-tw/SKILL.md`, then write or consume a concise
+   `/Users/nokiy/.codex/skills/humanizer-zh-tw/SKILL.md`, then write or consume a concise
    `slides.md` (one slide per `---` section). Every visible line must be
    short customer-facing copy. Default to a visual, flow, map, comparison, or
    product image with editable labels; do not write the speaker script into
@@ -68,10 +68,9 @@ Read only what the task needs:
    The deck should read like a finished proposal, not a scaffold. Run the
    Humanizer pass before layout and treat the accepted copy as locked input.
    Reject formulaic AI sentence frames in both visible copy and speaker notes,
-   including title phrasing built on `先＋動作`, `先……再……`, `不是……而是……`,
-   `不在……而在……`, `並非……而是……`, `不只是……而是……`, `不只……`,
-   `不僅……而且……`, and `真正的……`. State the condition, action, evidence,
-   or result directly.
+   including title phrasing built on `先＋動作`, `先……再……`, `不是……而是……`, `不只是……而是……`,
+   `不只……`, `不僅……而且……`, and `真正的……`. State the condition,
+   action, evidence, or result directly.
    Preserve exact user-locked wording, numbers, units, names, model numbers,
    technical terms, quotations, and citations. For patch revisions, review
    only changed or newly created text; do not rewrite untouched approved slides.
@@ -161,6 +160,18 @@ Read `references/markdown-format.md` first for nontrivial decks.
   catalog in `assets-manifest.md`; missing required assets block the build and
   must not trigger a silent fallback.
 - Cards only for repeated items, metrics, comparisons, or capability maps.
+- Four-column module maps use a deterministic alternating rhythm: columns 1
+  and 3 use the muted TWS red treatment; columns 2 and 4 use white. Do not
+  choose card or bottom-band colors from an arbitrary `highlight` index. A
+  single emphasized card is allowed only when the content establishes a clear
+  selected state, recommendation, exception, or current step. Place connector
+  arrows at the exact geometric center of the gap between adjacent cards.
+- Repeated process labels, equal cards, and stacked text boxes use a
+  deterministic alternating fill across the complete sequence: odd items use
+  muted TWS red and even items use white. Do not color only the middle or final
+  item for decoration. A separate selected-state treatment is allowed only for
+  an explicit selection, warning, recommendation, exception, or active step
+  named in the slide content.
 - For a complete TWS service-scope page, use the user-approved v0.8
   authoritative global image in `assets-manifest.md`. Use the v0.7 overlay
   master only when editable labels or a customer-specific subset is required;
@@ -171,8 +182,8 @@ Read `references/markdown-format.md` first for nontrivial decks.
 - Copy and numeric-claim discipline: `shared-governance.md` +
   `data/banned_terms.json` + `data/copy_rules.json`.
 - Formulaic contrast/reveal structures listed in `customer-copy.md` are hard
-  failures under `--strict-copy`; this includes sentence variants in visible
-  copy and speaker notes.
+  failures under `--strict-copy`; this includes sentence variants with commas,
+  spaces, or short intervening clauses.
 - Never call `add_image()` with both width and height. Use
   `add_image_contain()`/`add_logo()` so logos and product images cannot be
   stretched or cropped accidentally. Fixed-height helpers raise when copy

@@ -1,4 +1,4 @@
 interface:
-  display_name: "Nokiy Deck Orchestrator"
-  short_description: "整合文案審查、可編輯簡報、視覺驗收與 PDF 流程"
-  default_prompt: "Use $nokiy-deck-orchestrator to create or revise a polished editable presentation with mandatory copy and visual QA."
+  display_name: "做簡報"
+  short_description: "建立、修改、檢查與發布 TWS 客戶簡報的統一管線"
+  default_prompt: "請用權威簡報管線處理這份簡報，保留案件資料、素材驗證、雙重 QA 與發布讀回證據。"

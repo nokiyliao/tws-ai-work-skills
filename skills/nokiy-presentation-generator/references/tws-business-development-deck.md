@@ -163,6 +163,12 @@ internal documents.
   `assets-manifest.md`).
 - Polished but operational: fewer decorative blocks, more readable diagrams
   and practical checks.
+- Four equal module columns follow a red / white / red / white sequence. The
+  color order communicates visual rhythm only; do not imply a random priority
+  by coloring one lower band or one card without a stated semantic reason.
+  Connector arrows sit at the center of each inter-card gap. If the page needs
+  one selected module, state why it is selected and use a distinct selected
+  treatment instead of reusing the alternating fill as a status cue.
 
 ## Validation
 

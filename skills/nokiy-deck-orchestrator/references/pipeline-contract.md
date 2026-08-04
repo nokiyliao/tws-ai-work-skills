@@ -16,23 +16,55 @@ deck with both builders.
 ```text
 <run-dir>/
   deck_pipeline_state.json
+  input.json
+  research/
+    source-snapshot.json
+    source-notes.md
+  proposal/
+    customer-profile.json
+    deck-requirements.json
+    proposal-content.json
   outline.md
   copy/
     source.md
     humanized.md
     copy-lock.json
   assets/
+    selection-manifest.json
+    verification-receipt.json
     registry.json
   rendered/
     slide-01.png
   visual_qa.md
   mechanical_qa.txt
   build_note.md
+  build-manifest.json
   final.pptx
+  deployment-receipt.json
+  registration-receipt.json
+  download-readback.json
 ```
 
 File names may be more descriptive, but each phase must record an existing
 evidence path in `deck_pipeline_state.json`.
+
+## TWS Case Identity
+
+Use `lead_id` as the immutable case key. Copy the formal company name and case
+facts from the source snapshot into `input.json`. Validate it with
+`tws-input.schema.json`. Record aliases separately and never use them to change
+the formal customer identity.
+
+## TWS Asset Gate
+
+Generate `selection-manifest.json` from the customer profile and deck
+requirements. Run the library verifier with `--selection` and preserve its
+receipt. The build may access only assets listed in the verified manifest.
+
+The registry retains asset ID, relative path, digest, evidence level, allowed
+use, reuse scope, and the slide where a designer placed it. Selection does not
+assign a slide. Official, concept, and `customer_only` boundaries are blocking
+rules.
 
 ## Copy Gate
 
@@ -94,3 +126,7 @@ Required pass phases: `source`, `outline`, `copy`, `build`, `visual_qa`, and
 `mechanical_qa`. `sample` must be `pass` or an allowed `skipped`; `pdf` must be
 `pass` when requested and `skipped` otherwise.
 
+TWS build acceptance also requires `case_lock`, `proposal`, `asset_selection`,
+and `asset_verification`. Platform publication additionally requires `deploy`,
+`register`, and `readback`. Readback evidence binds the released PPTX digest to
+the Mini file, database row, and platform download.

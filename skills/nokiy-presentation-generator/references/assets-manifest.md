@@ -1,7 +1,8 @@
-# Assets Manifest (Portable Configuration)
+# Assets Manifest (Canonical Paths)
 
-Configure the paths in this file for each computer. Other files should refer to
-this manifest instead of hard-coding local paths.
+All absolute paths used by the TWS deck skills live here. Other files must
+reference this manifest instead of hard-coding paths, so a move only requires
+editing this file.
 
 ## Contents
 
@@ -12,30 +13,26 @@ this manifest instead of hard-coding local paths.
 - Output locations
 - Presenton local platform
 
-Choose three local roots before the first run:
+If a path is missing, search for equivalents with `find` under:
 
-- `<company-data-root>`: official company, product, logo, and brand files.
-- `<project-root>`: active customer or business-development projects.
-- `<output-root>`: temporary renders, QA files, and final deliverables.
+- `/Users/nokiy/Desktop/🏢公司資料`
+- `/Users/nokiy/Desktop/📋工作專案/新廠清單`
 
 ## TWS Service-Scope Asset Set (current authority: v0.8)
 
-Bundled with this skill:
+Base folder:
+`/Users/nokiy/Desktop/📋工作專案/新廠清單/04_簡報與文件_Docs/陌生開發提案/demo_統流開發_TWS客戶版/tws_scope_assets/`
 
-- Authoritative TWS full-service global image:
-  `../assets/TWS_service_scope_authoritative_global_v0.8.png`
-- Shared new-factory material-flow illustration:
-  `../assets/TWS_shared_new_factory_material_flow_v1.png`
-- Shared asset catalog and selection policy: `../assets/catalog.json`
-
-The user-approved v0.8 image is the visual authority whenever a slide presents
-TWS's complete solution range. Do not regenerate, reinterpret, or silently
-substitute another overview. Copy selected bundled assets into each deck's
-local `assets/` folder before building the PPTX.
-
-Optional editable overlay set (current: v0.7):
-
-Base folder: `<company-data-root>/presentation-assets/tws-scope/`
+- Authoritative TWS full-service global image (default for every complete
+  service-scope or integrated-logistics overview):
+  `TWS_service_scope_authoritative_global_v0.8.png`
+- This user-approved v0.8 image is the global visual authority. Use it before
+  the v0.7 scene whenever the slide represents TWS's complete solution range.
+  Do not regenerate, reinterpret, or silently substitute another overview.
+- Shared new-factory visual catalog:
+  `shared_factory_visuals/catalog.json`
+- Reusable material-flow illustration:
+  `shared_factory_visuals/TWS_shared_new_factory_material_flow_v1.png`
 
 - Editable overlay master (slide 1 = customer overlay, slide 2 = full-coverage
   overlay, slide 3 = no-text base):
@@ -46,8 +43,8 @@ Base folder: `<company-data-root>/presentation-assets/tws-scope/`
   `TWS_service_scope_editable_overlay_master_v0.7_labels.json`
 - PDF preview: `TWS_service_scope_editable_overlay_master_v0.7.pdf`
 
-Older versions (v0.2–v0.7) remain in the external folder for reference and
-editable overlay use; do not use them as the default full-range overview.
+Older versions (v0.2–v0.7) remain in the same folder for reference and editable
+overlay use; do not use them as the default full-range overview.
 
 Keep the background as raster; labels, leader lines, brand names, and promise
 boundaries must stay editable native PPTX objects (except for explicitly
@@ -56,15 +53,16 @@ requested PDF previews).
 ## Master Direction Documents
 
 Current authoritative direction:
-`<company-data-root>/presentation-guides/TWS_customer_deck_master.md`
+`/Users/nokiy/Desktop/📋工作專案/新廠清單/04_簡報與文件_Docs/陌生開發提案/demo_統流開發_TWS客戶版/TWS_客戶開發簡報權威母版_v0.7.md`
 
 Older `_v0.x.md` versions are in the same folder; consult only if the user asks
 about history.
 
 ## Logos
 
-- TWS transparent logo folder: `<company-data-root>/brand/logos/TWS/`
-- Brand material folder: `<company-data-root>/brand/`
+- TWS transparent logo folder:
+  `/Users/nokiy/Desktop/🏢公司資料/其他檔案/Logo/TWS/TWS_NEW_LOGO_20200915`
+- Brand material folder: `/Users/nokiy/Desktop/品牌素材/`
 
 Logo rules: use transparent or official logo assets whenever available. Do not
 use Image 2.0 to recreate logos. Place logos with contain/no-crop helpers such
@@ -74,24 +72,25 @@ them into generated backgrounds when the user may need manual adjustment.
 ## Product Source Decks
 
 - Common product source deck:
-  `<company-data-root>/product-decks/TWS_product_overview.pptx`
-- Product/spec folders: `<company-data-root>/products/` (奔騰簡介, Modula,
-  AMR/洗地機, 堆高機, 梭車, 料架與地坪, 碼頭月台, WMS 軟體)
+  `/Users/nokiy/Desktop/🏢公司資料/簡報資料/2025年/奔騰物流-自動化產品介紹Nokiy.pptx`
+- Product/spec folders:
+  `/Users/nokiy/Desktop/🏢公司資料/工作文件/產品與規格資料/01..08_*` (奔騰簡介,
+  Modula, AMR/洗地機, 堆高機, 梭車, 料架與地坪, 碼頭月台, WMS 軟體)
 
 ## Generated Images
 
 - Image 2.0 outputs land in `$CODEX_HOME/generated_images/<thread-id>/`
-  (`~/.codex/generated_images/<thread-id>/`).
+  (`/Users/nokiy/.codex/generated_images/<thread-id>/`).
 - Always copy the chosen image into the customer deck `assets/` folder before
   referencing it in a build script.
 - For new-factory decks, generate only the customer-specific cover by default.
-  Interior workflow and service-scope pages must query `../assets/catalog.json`
-  first. Generate a new interior visual only when the catalog has no suitable
-  asset and the gap is recorded in the build note.
+  All interior workflow and service-scope pages must query the shared visual
+  catalog first. Generate a new interior visual only after the catalog has no
+  suitable asset and the gap is recorded in the build note.
 - Missing required library assets are blocking errors. Never silently replace
-  them with a photo, an older version, or unrelated generated art.
+  them with a photo, an older version, or an unrelated generated image.
 - Record final generated/user/official images in `assets/registry.json` using
-  `~/.codex/skills/nokiy-presentation-generator/data/asset_registry.schema.json`.
+  `/Users/nokiy/.codex/skills/nokiy-presentation-generator/data/asset_registry.schema.json`.
 - Allowed final uses: de-identified cover/chapter backgrounds, workflow or
   WMS/WCS concept illustrations, and non-product scenario visuals. Not allowed
   as logo, product proof, equipment-selection image, specific model exterior,
@@ -99,9 +98,10 @@ them into generated backgrounds when the user may need manual adjustment.
 
 ## Output Locations
 
-- Scratch workspace: `<output-root>/<timestamp>/presentations/<deck-slug>/`
+- Scratch workspace (all decks):
+  `/Users/nokiy/Documents/Playground/outputs/<timestamp>/presentations/<deck-slug>/`
 - Final customer proposal deliverables:
-  `<project-root>/<客戶名>/deliverables/`
+  `/Users/nokiy/Desktop/📋工作專案/新廠清單/04_簡報與文件_Docs/陌生開發提案/<客戶名>_TWS客戶版/`
 - Final filename patterns (pick the one matching the deck purpose; avoid
   `白皮書` for customer proposals and never `output.pptx`):
   - `<客戶名>_TWS智慧物流自動化導入交流提案_<YYYYMMDD>.pptx`
@@ -111,19 +111,19 @@ them into generated backgrounds when the user may need manual adjustment.
 
 ## Presenton Local Platform (only when the user asks for the platform)
 
-Checkout: `<presenton-root>`
+Checkout: `/Users/nokiy/Documents/Playground/presenton-local`
 (FastAPI venv in `servers/fastapi/.venv`, Next.js deps installed, no Docker,
 prefer the Web dev route over Electron.)
 
 ```bash
-cd <presenton-root>/servers/fastapi
-PATH="$HOME/.local/bin:$PATH" APP_DATA_DIRECTORY=<presenton-root>/app_data \
+cd /Users/nokiy/Documents/Playground/presenton-local/servers/fastapi
+PATH="$HOME/.local/bin:$PATH" APP_DATA_DIRECTORY=/Users/nokiy/Documents/Playground/presenton-local/app_data \
   CAN_CHANGE_KEYS=true DISABLE_ANONYMOUS_TRACKING=true \
   uv run python server.py --port 5000
 ```
 
 ```bash
-cd <presenton-root>/servers/nextjs
+cd /Users/nokiy/Documents/Playground/presenton-local/servers/nextjs
 NEXT_PUBLIC_FAST_API=http://127.0.0.1:5000 FAST_API_INTERNAL_URL=http://127.0.0.1:5000 \
   npm run dev -- --port 3000
 ```

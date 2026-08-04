@@ -99,7 +99,7 @@ visible in chat but missing from `$CODEX_HOME/generated_images`, recover it from
 the Codex session JSONL before continuing:
 
 ```bash
-python ~/.codex/skills/nokiy-presentation-generator/scripts/recover_imagegen_outputs.py \
+python /Users/nokiy/.codex/skills/nokiy-presentation-generator/scripts/recover_imagegen_outputs.py \
   --session /path/to/current/session.jsonl \
   --out /path/to/deck/assets/image2_recovered --limit-last 5 \
   --prompt-contains "distinctive scene phrase"
@@ -168,7 +168,7 @@ errors still require manual inspection.
 
 ### Mandatory Humanizer Gate
 
-Read `~/.codex/skills/humanizer-zh-tw/SKILL.md` before drafting or
+Read `/Users/nokiy/.codex/skills/humanizer-zh-tw/SKILL.md` before drafting or
 rewriting customer-visible copy. Every model-authored or changed title, label,
 table cell, diagram node, footer, closing line, and speaker note must pass that
 review before layout begins. Preserve user-locked wording, numeric claims,
