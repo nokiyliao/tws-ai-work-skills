@@ -1,6 +1,6 @@
 [project]
 name = "tws-ai-runtime"
-version = "2026.08.05.5"
+version = "2026.08.05.6"
 description = "Isolated Python dependencies for TWS AI deck production"
 requires-python = ">=3.10"
 dependencies = [

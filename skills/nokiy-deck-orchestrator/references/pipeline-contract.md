@@ -32,6 +32,7 @@ deck with both builders.
   assets/
     selection-manifest.json
     verification-receipt.json
+    visual-plan.json
     registry.json
   rendered/
     slide-01.png
@@ -71,6 +72,17 @@ use, reuse scope, and the slide where a designer placed it. Selection does not
 assign a slide. Official, concept, and `customer_only` boundaries are blocking
 rules. `customer_only` never controls HTTP authorization for company members;
 The public Tunnel endpoint exposes only the deliberately read-only catalog API.
+
+Every TWS deck, including a generic company introduction without a customer
+case, must produce `tws_deck_visual_plan_v1`. It maps every slide to one of:
+`official_asset`, `concept_asset`, `generated_concept`, `editable_diagram`,
+`data_visual`, or an explicitly justified `typography_only` exception. Run
+`scripts/validate_visual_plan.py` before build and again after build with the
+asset registry and final PPTX. The second pass verifies actual per-slide media
+relationships, not merely the presence of files under `ppt/media`.
+
+The Markdown fast builder is not a TWS final builder. It is allowed only for
+non-TWS `general` internal drafts.
 
 ## Copy Gate
 
@@ -132,7 +144,8 @@ Required pass phases: `source`, `outline`, `copy`, `build`, `visual_qa`, and
 `mechanical_qa`. `sample` must be `pass` or an allowed `skipped`; `pdf` must be
 `pass` when requested and `skipped` otherwise.
 
-TWS build acceptance also requires `case_lock`, `proposal`, `asset_selection`,
-and `asset_verification`. Platform publication additionally requires `deploy`,
+Both TWS workflows require `asset_selection`, `asset_verification`, and
+`visual_plan`. Named-customer `tws-new-factory` acceptance also requires
+`case_lock` and `proposal`. Platform publication additionally requires `deploy`,
 `register`, and `readback`. Readback evidence binds the released PPTX digest to
 the Mini file, database row, and platform download.

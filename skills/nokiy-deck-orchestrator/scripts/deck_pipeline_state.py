@@ -18,6 +18,7 @@ PHASES = (
     "copy",
     "asset_selection",
     "asset_verification",
+    "visual_plan",
     "sample",
     "build",
     "visual_qa",
@@ -35,8 +36,9 @@ PREREQUISITES = {
     "copy": ("outline",),
     "asset_selection": ("copy",),
     "asset_verification": ("asset_selection",),
-    "sample": ("copy", "asset_verification"),
-    "build": ("copy", "asset_verification", "sample"),
+    "visual_plan": ("copy", "asset_verification"),
+    "sample": ("copy", "visual_plan"),
+    "build": ("copy", "visual_plan", "sample"),
     "visual_qa": ("build",),
     "mechanical_qa": ("visual_qa",),
     "pdf": ("mechanical_qa",),
@@ -45,7 +47,8 @@ PREREQUISITES = {
     "readback": ("register",),
 }
 ENTRY_SKILL = "nokiy-deck-orchestrator"
-ROUTABLE_PHASES = ("proposal", "copy", "sample", "build", "visual_qa", "mechanical_qa")
+ROUTABLE_PHASES = ("proposal", "copy", "visual_plan", "sample", "build", "visual_qa", "mechanical_qa")
+TWS_ASSET_PHASES = {"asset_selection", "asset_verification", "visual_plan"}
 
 
 def now() -> str:
@@ -104,8 +107,10 @@ def phase_ok(state: dict, phase: str) -> bool:
     status = state["phases"][phase]["status"]
     if status == "pass":
         return True
+    if state.get("workflow") in {"tws-company", "tws-new-factory"} and phase in TWS_ASSET_PHASES:
+        return False
     if status == "skipped" and phase in {
-        "case_lock", "proposal", "asset_selection", "asset_verification",
+        "case_lock", "proposal", "asset_selection", "asset_verification", "visual_plan",
         "sample", "pdf", "deploy", "register", "readback",
     }:
         return True
@@ -115,8 +120,8 @@ def phase_ok(state: dict, phase: str) -> bool:
 def delegation_errors(state: dict, phase: str) -> list[str]:
     """Validate that an internal presentation skill has an orchestrator handoff."""
     errors: list[str] = []
-    if state.get("schema_version") != 3:
-        errors.append("state schema_version must be 3; reinitialize with the current orchestrator")
+    if state.get("schema_version") != 4:
+        errors.append("state schema_version must be 4; reinitialize with the current orchestrator")
     routing = state.get("routing") or {}
     if routing.get("entry_skill") != ENTRY_SKILL:
         errors.append(f"routing.entry_skill must be {ENTRY_SKILL}")
@@ -142,21 +147,28 @@ def cmd_init(args: argparse.Namespace) -> int:
     path = state_path(str(run_dir))
     if path.exists() and not args.force:
         raise SystemExit(f"state file already exists: {path}")
-    tws = args.workflow == "tws-new-factory"
-    if tws and (not args.lead_id or not args.customer_name or not args.input):
+    named_customer = args.workflow == "tws-new-factory"
+    tws = args.workflow in {"tws-company", "tws-new-factory"}
+    if named_customer and (not args.lead_id or not args.customer_name or not args.input):
         raise SystemExit("tws-new-factory requires --lead-id, --customer-name, and --input")
     input_path = Path(args.input).expanduser().resolve() if args.input else None
     if input_path and not input_path.exists():
         raise SystemExit(f"input file not found: {input_path}")
-    input_data = validate_tws_input(input_path, args.lead_id, args.customer_name, args.mode) if tws else {}
+    input_data = validate_tws_input(input_path, args.lead_id, args.customer_name, args.mode) if named_customer else {}
     sample_status = "skipped" if args.mode == "revision" else "pending"
     pdf_status = "pending" if args.pdf_requested else "skipped"
-    tws_only = {"case_lock", "proposal", "asset_selection", "asset_verification", "deploy", "register", "readback"}
+    named_only = {"case_lock", "proposal", "deploy", "register", "readback"}
+    asset_required = {"asset_selection", "asset_verification", "visual_plan"}
+    skipped_for_workflow = set()
+    if not named_customer:
+        skipped_for_workflow.update(named_only)
+    if not tws:
+        skipped_for_workflow.update(asset_required)
     state = {
-        "schema_version": 3,
+        "schema_version": 4,
         "routing": {
             "entry_skill": ENTRY_SKILL,
-            "contract": "tws_deck_routing_v1",
+            "contract": "tws_deck_routing_v2",
         },
         "workflow": args.workflow,
         "mode": args.mode,
@@ -171,7 +183,7 @@ def cmd_init(args: argparse.Namespace) -> int:
         "phases": {
             phase: {
                 "status": (
-                    "skipped" if phase in tws_only and not tws else
+                    "skipped" if phase in skipped_for_workflow else
                     sample_status if phase == "sample" else
                     pdf_status if phase == "pdf" else
                     "pending"
@@ -190,6 +202,12 @@ def cmd_init(args: argparse.Namespace) -> int:
 
 def cmd_set(args: argparse.Namespace) -> int:
     path, state = load(args.run_dir)
+    if (
+        args.status == "skipped"
+        and state.get("workflow") in {"tws-company", "tws-new-factory"}
+        and args.phase in TWS_ASSET_PHASES
+    ):
+        raise SystemExit(f"cannot skip required TWS asset phase: {args.phase}")
     if args.status in {"pass", "skipped"}:
         for prerequisite in PREREQUISITES.get(args.phase, ()):
             if not phase_ok(state, prerequisite):
@@ -214,8 +232,10 @@ def cmd_set(args: argparse.Namespace) -> int:
 def completion_errors(state: dict, target: str) -> list[str]:
     errors = []
     required = ["source", "outline", "copy", "build", "visual_qa", "mechanical_qa"]
+    if state.get("workflow") in {"tws-company", "tws-new-factory"}:
+        required += ["asset_selection", "asset_verification", "visual_plan"]
     if state.get("workflow") == "tws-new-factory":
-        required += ["case_lock", "proposal", "asset_selection", "asset_verification"]
+        required += ["case_lock", "proposal"]
         if target == "publish":
             required += ["deploy", "register", "readback"]
     for phase in required:
@@ -274,7 +294,7 @@ def parser() -> argparse.ArgumentParser:
     init = commands.add_parser("init")
     init.add_argument("--run-dir", required=True)
     init.add_argument("--mode", choices=("editable", "image", "revision"), default="editable")
-    init.add_argument("--workflow", choices=("general", "tws-new-factory"), default="general")
+    init.add_argument("--workflow", choices=("general", "tws-company", "tws-new-factory"), default="general")
     init.add_argument("--job-id")
     init.add_argument("--lead-id")
     init.add_argument("--customer-name")

@@ -1,4 +1,4 @@
 interface:
   display_name: "Nokiy Presentation Generator"
   short_description: "Internal editable-build phase; requires orchestrator state"
-  default_prompt: "Continue only a delegated build or mechanical_qa phase from an existing nokiy-deck-orchestrator run. Require the matching route guard and approved prerequisites, then return phase evidence without publishing or declaring the whole task complete."
+  default_prompt: "Continue only a delegated build or mechanical_qa phase from an existing nokiy-deck-orchestrator run. Require the matching route guard, PASS asset receipt, and validated per-slide visual plan for TWS work; never use the Markdown fast builder for a TWS final deck. Return phase evidence without publishing or declaring the whole task complete."

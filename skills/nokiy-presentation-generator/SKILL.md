@@ -58,7 +58,8 @@ Read only what the task needs:
   user spec and builds/revises the PPTX; it does not invent the customer thesis.
 - High-polish customer-facing decks: use the installed Codex `Presentations`
   skill when available, then apply the TWS content rules here.
-- Fast internal decks or Markdown conversion: `scripts/markdown_to_pptx.py`.
+- Non-TWS `general` internal drafts only: `scripts/markdown_to_pptx.py`. Never
+  use it as the final builder for `tws-company` or `tws-new-factory`.
 - Custom python-pptx builds: import `scripts/tws_pptx.py` (see below) instead
   of re-implementing layout helpers.
 - Self-hosted platform requests only: Presenton (paths and run commands in
@@ -88,7 +89,11 @@ Read only what the task needs:
    Preserve exact user-locked wording, numbers, units, names, model numbers,
    technical terms, quotations, and citations. For patch revisions, review
    only changed or newly created text; do not rewrite untouched approved slides.
-4. Build the PPTX. For custom builds:
+4. Build the PPTX. A TWS handoff must include a PASS asset verification receipt
+   and `tws_deck_visual_plan_v1`; route the `visual_plan` guard before building.
+   Every slide must implement its declared visual type. Generated concepts must
+   be created through ImageGen/Image2 and preserve the exact prompt in the asset
+   registry. For custom builds:
 
    If the pipeline handoff includes an asset selection manifest, verify it
    before reading, copying, or embedding any selected asset. A failure stops
@@ -99,10 +104,12 @@ Read only what the task needs:
      --library <asset-library> --selection <scratch>/asset-selection.json
    ```
 
-   The manifest lists candidates only. Decide placement during slide design,
+   The manifest lists candidates only. Placement comes from the separately
+   validated per-slide visual plan,
    within each asset's `allowed_use`: `official` is product evidence only,
-   `concept` is scenario illustration only, and `customer_only` is valid only
-   for the matching customer.
+   `concept` is scenario illustration only, and `customer_only` retains its
+   source context for selector/audit decisions without acting as an internal
+   HTTP authorization gate.
 
    ```python
    import os
@@ -149,6 +156,10 @@ Read only what the task needs:
    locked-asset hashes, asset provenance and media coverage, build-note
    presence, optional rendered-slide OCR, and embedded video. Fix failures;
    layout exceptions must include `--layout-exception-reason` and are reported.
+   For TWS work, also run the orchestrator's `validate_visual_plan.py` with the
+   selection manifest, verification receipt, asset registry, final PPTX, and
+   expected slide count. It must prove each planned image is embedded on its
+   declared slide before mechanical QA may pass.
 6. Keep a build note in the scratch folder (contents listed in
    `shared-governance.md`). Output paths and filename patterns are in
    `assets-manifest.md` — use a thread-scoped scratch directory and specific
@@ -156,6 +167,10 @@ Read only what the task needs:
 7. PDF only on explicit request (policy in `shared-governance.md`).
 
 ## Markdown Conversion
+
+This converter is a convenience path for non-TWS `general` internal drafts. It
+is not a production path for TWS company, product, capability, or customer
+decks, even when the Markdown contains image links.
 
 ```bash
 PATH="$HOME/.local/bin:$PATH" uv run --with python-pptx \

@@ -114,7 +114,7 @@ def flatten_runtime_bools(runtime: dict[str, Any]) -> dict[str, bool]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--workflow", choices=("general", "tws-new-factory"), default="general")
+    parser.add_argument("--workflow", choices=("general", "tws-company", "tws-new-factory"), default="general")
     parser.add_argument(
         "--asset-mode",
         choices=("remote", "local"),
@@ -146,7 +146,7 @@ def main(argv: list[str] | None = None) -> int:
     }
     details: dict[str, Any] = {"skills_root": str(SKILLS)}
 
-    if args.workflow == "tws-new-factory":
+    if args.workflow in {"tws-company", "tws-new-factory"}:
         if args.asset_mode == "remote":
             has_base_url, has_catalog_pin = remote_configured()
             checks.update(

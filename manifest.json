@@ -1,6 +1,6 @@
 {
   "name": "TWS AI Work Skills",
-  "version": "2026.08.05.5",
+  "version": "2026.08.05.6",
   "skills": [
     "skills/nokiy-deck-orchestrator",
     "skills/tws-customer-proposal-pipeline",
@@ -18,7 +18,12 @@
     "supportingSkills": [
       "skills/humanizer-zh-tw"
     ],
-    "stateContract": "tws_deck_routing_v1"
+    "stateContract": "tws_deck_routing_v2",
+    "workflows": {
+      "general": { "assetPolicy": "optional", "customerIdentity": "optional" },
+      "tws-company": { "assetPolicy": "required", "customerIdentity": "optional" },
+      "tws-new-factory": { "assetPolicy": "required", "customerIdentity": "required" }
+    }
   },
   "excludedUntilValidated": [
     "CAD drafting",

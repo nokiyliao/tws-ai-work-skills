@@ -313,12 +313,26 @@ def add_cover(slide, spec: SlideSpec, deck_title: str, theme: dict[str, str], fo
     add_rect(slide, Inches(0), Inches(0), Inches(0.28), SLIDE_H, theme["accent"])
     add_rect(slide, Inches(0.28), Inches(0), Inches(0.05), SLIDE_H, theme["accent2"])
     add_textbox(slide, footer, Inches(0.85), Inches(0.66), Inches(4.2), Inches(0.24), 9, "C9D5CF", bold=True, margin=0)
-    add_textbox(slide, deck_title or spec.title, Inches(0.82), Inches(1.75), Inches(9.8), Inches(1.45), 43, "FFFFFF", bold=True, line_spacing=0.9)
+    valid_images = [path for path in spec.images if path.exists()]
+    title_width = Inches(7.05) if valid_images else Inches(9.8)
+    add_textbox(slide, deck_title or spec.title, Inches(0.82), Inches(1.75), title_width, Inches(1.45), 43, "FFFFFF", bold=True, line_spacing=0.9)
     # Keep the cover to one short line; supporting detail belongs in the deck,
     # not in a paragraph under the title.
     subtitle = spec.body[0] if spec.body else ""
     if subtitle:
-        add_textbox(slide, subtitle, Inches(0.88), Inches(3.32), Inches(7.9), Inches(0.62), 17, "E5ECE8", margin=0.03)
+        subtitle_width = Inches(6.55) if valid_images else Inches(7.9)
+        add_textbox(slide, subtitle, Inches(0.88), Inches(3.32), subtitle_width, Inches(0.62), 17, "E5ECE8", margin=0.03)
+
+    if valid_images:
+        image_x, image_y = Inches(8.35), Inches(1.18)
+        image_w, image_h = Inches(4.25), Inches(4.95)
+        picture = slide.shapes.add_picture(str(valid_images[0]), image_x, image_y, width=image_w)
+        if picture.height > image_h:
+            old_width, old_height = picture.width, picture.height
+            picture.height = image_h
+            picture.width = int(old_width * image_h / old_height)
+        picture.left = image_x + int((image_w - picture.width) / 2)
+        picture.top = image_y + int((image_h - picture.height) / 2)
 
     add_rect(slide, Inches(0.86), Inches(5.28), Inches(3.4), Inches(0.64), "213F38", "43675C")
     add_textbox(slide, footer, Inches(1.08), Inches(5.47), Inches(3.0), Inches(0.2), 10, "DCE7E2", bold=True, valign=MSO_ANCHOR.MIDDLE, margin=0)

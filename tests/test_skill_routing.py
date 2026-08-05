@@ -6,7 +6,9 @@ import importlib.util
 import json
 import re
 import sys
+import tempfile
 import unittest
+from argparse import Namespace
 from pathlib import Path
 
 
@@ -37,10 +39,10 @@ def frontmatter_description(skill: str) -> str:
 
 def state_fixture() -> dict:
     return {
-        "schema_version": 3,
+        "schema_version": 4,
         "routing": {
             "entry_skill": "nokiy-deck-orchestrator",
-            "contract": "tws_deck_routing_v1",
+            "contract": "tws_deck_routing_v2",
         },
         "phases": {
             phase: {"status": "pending", "evidence": []}
@@ -54,8 +56,9 @@ class SkillMetadataRoutingTest(unittest.TestCase):
         manifest = json.loads((ROOT / "manifest.json").read_text(encoding="utf-8"))
         routing = manifest["routing"]
         self.assertEqual(routing["presentationEntryPoint"], "skills/nokiy-deck-orchestrator")
-        self.assertEqual(routing["stateContract"], "tws_deck_routing_v1")
+        self.assertEqual(routing["stateContract"], "tws_deck_routing_v2")
         self.assertEqual(len(routing["internalPresentationPhases"]), 3)
+        self.assertEqual(routing["workflows"]["tws-company"]["assetPolicy"], "required")
 
     def test_only_orchestrator_claims_complete_presentation_requests(self) -> None:
         entry = frontmatter_description("nokiy-deck-orchestrator")
@@ -89,9 +92,52 @@ class DelegationGuardTest(unittest.TestCase):
         self.assertEqual(STATE.delegation_errors(state, "proposal"), [])
 
         self.assertTrue(STATE.delegation_errors(state, "build"))
-        for phase in ("copy", "asset_selection", "asset_verification", "sample"):
+        for phase in ("copy", "asset_selection", "asset_verification", "visual_plan", "sample"):
             state["phases"][phase]["status"] = "pass"
         self.assertEqual(STATE.delegation_errors(state, "build"), [])
+
+    def test_tws_company_requires_assets_without_customer_case_phases(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            run_dir = Path(temp) / "company"
+            args = Namespace(
+                run_dir=str(run_dir), mode="editable", workflow="tws-company",
+                job_id=None, lead_id=None, customer_name=None, input=None,
+                source=[], pdf_requested=False, force=False,
+            )
+            self.assertEqual(STATE.cmd_init(args), 0)
+            state = json.loads((run_dir / "deck_pipeline_state.json").read_text(encoding="utf-8"))
+            for phase in ("asset_selection", "asset_verification", "visual_plan"):
+                self.assertEqual(state["phases"][phase]["status"], "pending")
+            for phase in ("case_lock", "proposal", "deploy", "register", "readback"):
+                self.assertEqual(state["phases"][phase]["status"], "skipped")
+
+            state["phases"]["copy"]["status"] = "pass"
+            state["phases"]["asset_selection"]["status"] = "skipped"
+            state["phases"]["asset_verification"]["status"] = "skipped"
+            state["phases"]["visual_plan"]["status"] = "skipped"
+            state["phases"]["sample"]["status"] = "pass"
+            route_errors = STATE.delegation_errors(state, "build")
+            self.assertTrue(any("asset" in error or "visual_plan" in error for error in route_errors))
+
+            skip_args = Namespace(
+                run_dir=str(run_dir), phase="asset_selection", status="skipped",
+                evidence=[], note=None,
+            )
+            with self.assertRaisesRegex(SystemExit, "cannot skip required TWS asset phase"):
+                STATE.cmd_set(skip_args)
+
+    def test_general_workflow_skips_tws_asset_phases(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            run_dir = Path(temp) / "general"
+            args = Namespace(
+                run_dir=str(run_dir), mode="editable", workflow="general",
+                job_id=None, lead_id=None, customer_name=None, input=None,
+                source=[], pdf_requested=False, force=False,
+            )
+            self.assertEqual(STATE.cmd_init(args), 0)
+            state = json.loads((run_dir / "deck_pipeline_state.json").read_text(encoding="utf-8"))
+            for phase in ("asset_selection", "asset_verification", "visual_plan"):
+                self.assertEqual(state["phases"][phase]["status"], "skipped")
 
     def test_closed_or_completed_phase_cannot_be_redelegated(self) -> None:
         state = state_fixture()

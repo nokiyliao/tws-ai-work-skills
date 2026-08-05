@@ -66,6 +66,12 @@ pipeline, editable generator, and Codex-PPT are internal phases and require a
 passing `deck_pipeline_state.py route` guard. The routing contract is declared
 in `manifest.json` and validated by the repository test suite.
 
+TWS company, capability, product, and teaching decks use the `tws-company`
+workflow; named-customer and new-factory proposals use `tws-new-factory`. Both
+routes require the remote selection manifest, digest verification, a per-slide
+visual plan, and post-build proof that planned images are embedded on the
+declared slides. The Markdown converter is limited to non-TWS internal drafts.
+
 ## Company learner experience
 
 Learners paste one installation prompt, open a customer workspace, and
@@ -116,4 +122,4 @@ RapidOCR engine nor a validated host engine is available.
 
 ## Version
 
-Current optimized release: `2026.08.05.5`.
+Current optimized release: `2026.08.05.6`.

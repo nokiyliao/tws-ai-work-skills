@@ -24,9 +24,14 @@ calls to this orchestrator:
 - `修改這份 PPT`
 - `檢查並發布簡報`
 
-When a TWS customer or case ID is present, select the `tws-new-factory`
-workflow automatically. Ask for missing identity data only when it cannot be
-resolved from the case database or provided files.
+Classify every TWS/TWSC/奔騰物流 company introduction, capability deck, product
+deck, teaching deck, or generic brand presentation as `tws-company`. Classify a
+named-customer, case-ID, or new-factory proposal as `tws-new-factory`. Use
+`general` only when the deck is genuinely unrelated to TWS. Both TWS workflows
+require remote asset selection, digest verification, and a per-slide visual
+plan; those phases may never be skipped. Ask for customer identity only for
+`tws-new-factory`, and only when it cannot be resolved from the case database or
+provided files.
 
 Coordinate the presentation pipeline. Do not duplicate or weaken the delegated
 skills. Keep the source authority, copy lock, visual acceptance, and mechanical
@@ -60,8 +65,9 @@ runs:
 python scripts/deck_pipeline_state.py route --run-dir <run-dir> --phase <phase>
 ```
 
-Use `proposal`, `copy`, `sample`, `build`, `visual_qa`, or `mechanical_qa` as
-the phase. A failed guard means routing is invalid and blocks that subskill.
+Use `proposal`, `copy`, `visual_plan`, `sample`, `build`, `visual_qa`, or
+`mechanical_qa` as the phase. A failed guard means routing is invalid and blocks
+that subskill.
 
 After Skill install, run the cross-platform runtime bootstrap before learner
 work. It detects Windows/macOS, Python, uv, the isolated runtime under
@@ -80,8 +86,9 @@ global site-packages), runs PPTX/PNG/OCR smoke tests, then remote
 `bootstrap_learner.py` and preflight. Office/LibreOffice are not auto-installed;
 missing system rendering tools fail closed with typed blockers.
 
-Run `scripts/preflight.py --workflow tws-new-factory` before creating a TWS
-job. Preflight checks skills, remote asset config, and real runtime
+Run `scripts/preflight.py --workflow tws-company` for a generic TWS deck, or
+`--workflow tws-new-factory` for a named-customer job. Preflight checks skills,
+remote asset config, and real runtime
 imports/renderer/rasterizer/OCR, and prints machine-readable JSON. Company
 learner mode is remote by default and uses administrator-injected service
 configuration. Any missing dependency is a blocking failure.
@@ -114,6 +121,15 @@ credential. Local maintenance is documented separately in
   embedding selected assets. Missing files, digest mismatches, and
   official/concept role mismatches block the build; `customer_only` remains in
   the receipt as audit metadata, not an internal customer-name access gate.
+- After verification, create `assets/visual-plan.json` with one ordered entry
+  for every slide. Validate it with `scripts/validate_visual_plan.py` before the
+  sample/build phase. The cover must use a hero visual; at least one third of
+  slides must be image-bearing; typography-only pages require an exception and
+  may not exceed 20 percent.
+- After building, run the same validator with `--asset-registry` and `--pptx`.
+  It checks that each catalog asset or generated concept is registered and
+  physically embedded on the planned slide. A selection manifest without this
+  built-deck readback is not visual completion evidence.
 - Official assets provide product or capability evidence. Concept assets
   provide scenario context. `customer_only` retains registered source context
   for audit but is not an HTTP authorization gate for the shared teaching library.
@@ -137,14 +153,20 @@ Choose one build mode. Do not mix final assembly engines.
 - `revision`: patch only the user-authorized slides or objects. Preserve all
   untouched content and locked assets.
 
+For `tws-company` and `tws-new-factory`, the Markdown fast builder is forbidden
+as a final assembly engine. It may be used only for a non-TWS `general` internal
+draft. TWS final decks must consume the verified visual plan and use the
+editable builder or the explicitly accepted image mode.
+
 `codex-ppt` is the visual acceptance authority in every mode. In editable and
 revision modes, apply its sample, rendering, inspection, and repair discipline
 to the rendered PPTX; do not use its image-only assembly engine.
 
 ## Mandatory Pipeline
 
-1. Initialize run state with `scripts/deck_pipeline_state.py init`. TWS jobs use
-   `--workflow tws-new-factory` with `--lead-id`, `--customer-name`, and
+1. Initialize run state with `scripts/deck_pipeline_state.py init`. Generic TWS
+   company/capability decks use `--workflow tws-company`. Named-customer jobs
+   use `--workflow tws-new-factory` with `--lead-id`, `--customer-name`, and
    `--input`.
 2. Read sources and establish authority. Use `pdf` for PDF extraction and page
    rendering. Do not create a PDF output unless the user asks in the current
@@ -160,9 +182,23 @@ to the rendered PPTX; do not use its image-only assembly engine.
      silently rewrite them.
    - Save the accepted copy and mark the `copy` phase passed. No build may start
      from draft copy.
-5. Create and verify the asset selection manifest for TWS work. Mark selection
-   and verification as separate phases. For a net-new deck, use the Codex-PPT
-   outline/style/sample gates. A revision
+5. For either TWS workflow, call the remote asset client, create the selection
+   manifest, and preserve its PASS verification receipt. Then create one
+   `tws_deck_visual_plan_v1` entry per slide, including official asset IDs,
+   generated-concept prompts, or editable diagram/data specifications. Run:
+
+   ```bash
+   python scripts/validate_visual_plan.py \
+     --plan <run-dir>/assets/visual-plan.json \
+     --selection-manifest <run-dir>/assets/selection-manifest.json \
+     --verification-receipt <run-dir>/assets/remote-verification-receipt.json \
+     --expect-slides <count>
+   ```
+
+   Only a PASS may mark `visual_plan` passed. If the plan requests a generated
+   concept, call ImageGen/Image2, preserve its prompt/digest in the asset
+   registry, and never use generated art as official product or brand proof.
+   For a net-new deck, use the Codex-PPT outline/style/sample gates. A revision
    may mark `sample` skipped only when the existing deck is the approved visual
    reference.
 6. Build the selected output mode. Editable mode must keep text, charts, tables,
@@ -174,7 +210,9 @@ to the rendered PPTX; do not use its image-only assembly engine.
    - Compare against the approved outline, style sample, source assets, and
      page role.
    - Repair or regenerate failed pages and repeat until the visual report passes.
-8. Run Nokiy mechanical QA after visual acceptance passes. It retains blocking
+8. Run Nokiy mechanical QA after visual acceptance passes. Re-run
+   `validate_visual_plan.py` with `--asset-registry` and `--pptx` to prove the
+   planned visuals were embedded on the planned slides. Nokiy QA retains blocking
    authority for package integrity, editability, copy rules, minimum font size,
    text fit, title-zone intrusion, overlap, asset registry, locked assets, OCR,
    media, and numeric/source consistency.
@@ -205,6 +243,13 @@ python scripts/deck_pipeline_state.py init --run-dir <scratch> --mode editable -
 python scripts/deck_pipeline_state.py set --run-dir <scratch> --phase copy --status pass --evidence <copy-file>
 python scripts/deck_pipeline_state.py show --run-dir <scratch>
 python scripts/deck_pipeline_state.py check --run-dir <scratch>
+```
+
+Generic TWS company deck initialization:
+
+```bash
+python scripts/deck_pipeline_state.py init \
+  --run-dir <job-dir> --workflow tws-company --mode editable --source <brief>
 ```
 
 Record real evidence files. Chat statements are not completion evidence.
