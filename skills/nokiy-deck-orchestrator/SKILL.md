@@ -57,6 +57,7 @@ Read the selected skill completely before using its phase:
   `~/.codex/skills/pdf/SKILL.md`
 
 Read `references/pipeline-contract.md` before starting a deck run.
+Read `references/tws-visual-plan.schema.json` before creating a TWS visual plan.
 
 Every delegated phase must pass the state guard before its supporting skill
 runs:

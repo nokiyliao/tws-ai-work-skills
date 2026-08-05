@@ -68,6 +68,11 @@ def fixture() -> tuple[dict, dict, dict]:
 
 
 class VisualPlanContractTest(unittest.TestCase):
+    def test_published_schema_matches_validator_contract(self) -> None:
+        schema = json.loads((ROOT / "skills/nokiy-deck-orchestrator/references/tws-visual-plan.schema.json").read_text(encoding="utf-8"))
+        self.assertEqual(schema["properties"]["schema_version"]["const"], VALIDATOR.PLAN_SCHEMA)
+        self.assertEqual(set(schema["properties"]["slides"]["items"]["properties"]["visual_type"]["enum"]), VALIDATOR.VISUAL_TYPES)
+
     def test_valid_plan_passes(self) -> None:
         plan, selection, receipt = fixture()
         errors, slides = VALIDATOR.validate_plan(plan, selection, receipt, 3)

@@ -28,6 +28,7 @@ REQUIRED = [
     ROOT / "skills/nokiy-deck-orchestrator/scripts/bootstrap_learner.py",
     ROOT / "skills/nokiy-deck-orchestrator/scripts/deck_pipeline_state.py",
     ROOT / "skills/nokiy-deck-orchestrator/scripts/validate_visual_plan.py",
+    ROOT / "skills/nokiy-deck-orchestrator/references/tws-visual-plan.schema.json",
     ROOT / "skills/nokiy-deck-orchestrator/runtime/requirements.lock",
     ROOT / "skills/nokiy-deck-orchestrator/runtime/requirements.txt",
     ROOT / "skills/nokiy-deck-orchestrator/runtime/pyproject.toml",
