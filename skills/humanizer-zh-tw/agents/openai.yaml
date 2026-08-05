@@ -1,0 +1,4 @@
+interface:
+  display_name: "繁體中文文案自然化"
+  short_description: "移除公式化 AI 文體，同時保留事實、專業語意與原始限制"
+  default_prompt: "請檢查並改寫繁體中文文案，使用具體名詞與可執行動詞，移除公式化對比、步驟式標語與廣告式宣告。"

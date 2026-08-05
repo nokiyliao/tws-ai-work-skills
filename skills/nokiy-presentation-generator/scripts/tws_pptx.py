@@ -37,14 +37,23 @@ FOOTER_Y = 7.06
 MARGIN = 0.68
 
 # ---- color tokens ----
-BG          = RGBColor(247, 246, 239)
-GREEN       = RGBColor(15, 73, 58)     # titles
-GREEN_2     = RGBColor(31, 98, 78)
-GREEN_PALE  = RGBColor(231, 242, 235)
-ORANGE      = RGBColor(214, 113, 47)   # single warm accent
-ORANGE_PALE = RGBColor(248, 231, 217)
-TEXT        = RGBColor(42, 55, 49)
-MUTED       = RGBColor(108, 119, 113)
+BG            = RGBColor(248, 247, 243)
+CHARCOAL      = RGBColor(45, 48, 50)
+CHARCOAL_2    = RGBColor(74, 78, 81)
+ZINC_SILVER   = RGBColor(184, 189, 192)
+ZINC_PALE     = RGBColor(235, 237, 238)
+BT_ORANGE_RED = RGBColor(229, 75, 39)
+BT_ORANGE_PALE = RGBColor(251, 230, 222)
+
+# Compatibility aliases for existing build scripts. New slides should use the
+# semantic tokens above rather than treating structural colors as green.
+GREEN       = CHARCOAL
+GREEN_2     = CHARCOAL_2
+GREEN_PALE  = ZINC_PALE
+ORANGE      = BT_ORANGE_RED
+ORANGE_PALE = BT_ORANGE_PALE
+TEXT        = CHARCOAL
+MUTED       = RGBColor(103, 108, 111)
 BORDER      = RGBColor(214, 222, 216)
 WHITE       = RGBColor(255, 255, 255)
 LIGHT       = RGBColor(250, 250, 246)

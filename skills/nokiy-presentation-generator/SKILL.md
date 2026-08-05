@@ -26,7 +26,7 @@ Read only what the task needs:
 - `references/customer-copy.md` — concise customer-facing copy method, title
   budgets, visual-first page structure, short labels, and AI-style sentence
   shapes to remove.
-- `/Users/nokiy/.codex/skills/humanizer-zh-tw/SKILL.md` — mandatory review for
+- `~/.codex/skills/humanizer-zh-tw/SKILL.md` — mandatory review for
   every newly authored or changed customer-visible line and speaker note.
 - `data/banned_terms.json` — mode-keyed banned/discouraged terms (shared with
   `scripts/qa_check.py`).
@@ -58,7 +58,7 @@ Read only what the task needs:
    route to `tws-customer-proposal-pipeline` first.
 2. Classify revision/build mode and scope per `shared-governance.md`.
 3. Read `references/customer-copy.md` and
-   `/Users/nokiy/.codex/skills/humanizer-zh-tw/SKILL.md`, then write or consume a concise
+   `~/.codex/skills/humanizer-zh-tw/SKILL.md`, then write or consume a concise
    `slides.md` (one slide per `---` section). Every visible line must be
    short customer-facing copy. Default to a visual, flow, map, comparison, or
    product image with editable labels; do not write the speaker script into
@@ -68,13 +68,27 @@ Read only what the task needs:
    The deck should read like a finished proposal, not a scaffold. Run the
    Humanizer pass before layout and treat the accepted copy as locked input.
    Reject formulaic AI sentence frames in both visible copy and speaker notes,
-   including title phrasing built on `先＋動作`, `先……再……`, `不是……而是……`, `不只是……而是……`,
-   `不只……`, `不僅……而且……`, and `真正的……`. State the condition,
-   action, evidence, or result directly.
+   including title phrasing built on `先＋動作`, `先……再……`, `不是……而是……`,
+   `不只是……而是……`, `不只……`, `不僅……而且……`, and `真正的……`. State the
+   condition, action, evidence, or result directly.
    Preserve exact user-locked wording, numbers, units, names, model numbers,
    technical terms, quotations, and citations. For patch revisions, review
    only changed or newly created text; do not rewrite untouched approved slides.
 4. Build the PPTX. For custom builds:
+
+   If the pipeline handoff includes an asset selection manifest, verify it
+   before reading, copying, or embedding any selected asset. A failure stops
+   the build; never replace the failed asset silently or select by filename:
+
+   ```bash
+   python3 <asset-library>/verify_assets.py \
+     --library <asset-library> --selection <scratch>/asset-selection.json
+   ```
+
+   The manifest lists candidates only. Decide placement during slide design,
+   within each asset's `allowed_use`: `official` is product evidence only,
+   `concept` is scenario illustration only, and `customer_only` is valid only
+   for the matching customer.
 
    ```python
    import os
@@ -102,6 +116,8 @@ Read only what the task needs:
      final-deck.pptx --mode customer_facing --expect-slides 12 \
      --strict-zone --strict-overlap --strict-discouraged --strict-copy --min-font 10 \
      --build-note scratch/build_note.md \
+     [--asset-library <asset-library> \
+      --asset-selection-manifest scratch/asset-selection.json] \
      [--locked-asset assets/xxx.png] [--asset-registry assets/registry.json] \
      [--rendered-dir rendered_slides --ocr-rendered] [--allow-video]
    ```
@@ -132,8 +148,8 @@ Read `references/markdown-format.md` first for nontrivial decks.
 
 - Editable text boxes and shapes; never slide-sized screenshots.
 - Quiet industrial business styling (tokens in `tws_pptx.py`): off-white
-  background, TWS dark green/charcoal text, one warm accent, white cards,
-  hairline borders, large numbers.
+  background, charcoal text, BT orange-red as the primary visual accent, zinc-
+  silver structural elements, white cards, hairline borders, large numbers.
 - Titles are short viewing instructions, not report headings. Prefer 4–12
   Chinese characters: `確認包裝條件`, `棧板定位`, `量測通道`. Avoid `先＋動作`, long claims,
   slogans, and sentences joined by `、` or `｜`.
@@ -155,35 +171,16 @@ Read `references/markdown-format.md` first for nontrivial decks.
   beat generated art. Hero/cover and Image 2.0 style rules are in
   `shared-governance.md`; default generated visuals are low-realism flat
   business illustrations, not photorealistic warehouse scenes.
-- For new-factory proposals, customer-specific generation is limited to the
-  cover by default. Interior workflow visuals must come from the shared asset
-  catalog in `assets-manifest.md`; missing required assets block the build and
-  must not trigger a silent fallback.
 - Cards only for repeated items, metrics, comparisons, or capability maps.
-- Four-column module maps use a deterministic alternating rhythm: columns 1
-  and 3 use the muted TWS red treatment; columns 2 and 4 use white. Do not
-  choose card or bottom-band colors from an arbitrary `highlight` index. A
-  single emphasized card is allowed only when the content establishes a clear
-  selected state, recommendation, exception, or current step. Place connector
-  arrows at the exact geometric center of the gap between adjacent cards.
-- Repeated process labels, equal cards, and stacked text boxes use a
-  deterministic alternating fill across the complete sequence: odd items use
-  muted TWS red and even items use white. Do not color only the middle or final
-  item for decoration. A separate selected-state treatment is allowed only for
-  an explicit selection, warning, recommendation, exception, or active step
-  named in the slide content.
-- For a complete TWS service-scope page, use the user-approved v0.8
-  authoritative global image in `assets-manifest.md`. Use the v0.7 overlay
-  master only when editable labels or a customer-specific subset is required;
-  keep added labels and leader lines editable.
+- For the TWS service-scope page, reuse the v0.7 overlay master (see
+  `assets-manifest.md`); keep labels and leader lines editable.
 - Lead with the user-corrected product lines when products are named: Toyota
   Material Handling group brands, Modula, MBB, Galaxis, AiTEN, Geek+, rack
   systems, FastLINK, LionsBot.
 - Copy and numeric-claim discipline: `shared-governance.md` +
   `data/banned_terms.json` + `data/copy_rules.json`.
 - Formulaic contrast/reveal structures listed in `customer-copy.md` are hard
-  failures under `--strict-copy`; this includes sentence variants with commas,
-  spaces, or short intervening clauses.
+  failures under `--strict-copy`; this includes variants in speaker notes.
 - Never call `add_image()` with both width and height. Use
   `add_image_contain()`/`add_logo()` so logos and product images cannot be
   stretched or cropped accidentally. Fixed-height helpers raise when copy

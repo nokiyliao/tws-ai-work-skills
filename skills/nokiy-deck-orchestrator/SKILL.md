@@ -50,8 +50,11 @@ Run `scripts/preflight.py --workflow tws-new-factory` before creating a TWS
 job. Any missing skill or asset-library dependency is a blocking failure.
 
 For TWS work, validate `input.json` against
-`references/tws-input.schema.json` and use the asset catalog at
-`/Users/nokiy/Documents/TWS_AI_開發簡報/2026-08-03/asset-library/catalog.json`.
+`references/tws-input.schema.json`. Prefer the controlled remote asset service
+configured outside this Skill (see `references/tws-asset-service.config.example.json`).
+It materializes a job-local, digest-verified catalog snapshot before selection.
+The local library is an explicit maintenance/development fallback only; never
+copy assets into this Skill or bypass the catalog verifier.
 
 ## TWS Authority Contract
 
@@ -60,14 +63,21 @@ For TWS work, validate `input.json` against
 - Preserve the input snapshot, proposal content, selection manifest,
   verification receipt, build manifest, QA reports, deployment receipt, and
   readback evidence in one job directory.
-- Run the catalog selector with the customer profile and deck requirements.
-  Asset placement remains a design decision.
-- Run `verify_assets.py --selection` before opening or embedding selected
-  assets. Missing files, digest mismatches, role mismatches, and customer scope
-  mismatches block the build.
+- For normal internal use, run `scripts/remote_asset_library.py` with the
+  administrator-managed config, customer profile, deck requirements, and the
+  trusted local `verify_assets.py`. It fetches only selected asset IDs, verifies
+  the remote catalog SHA-256 and each file SHA-1, and preserves a receipt.
+  Network, manifest, identity, or digest failures are blocking failures.
+- Asset placement remains a design decision. The service exposes no filesystem
+  paths and `customer_only` is not an HTTP access gate; it remains a selector
+  and verifier semantic for audit and suitable reuse.
+- Run `verify_assets.py --selection` against the materialized snapshot before
+  opening or embedding selected assets. Missing files, digest mismatches, and
+  official/concept role mismatches block the build; `customer_only` remains in
+  the receipt as audit metadata, not an internal customer-name access gate.
 - Official assets provide product or capability evidence. Concept assets
-  provide scenario context. `customer_only` assets remain bound to their
-  registered customer.
+  provide scenario context. `customer_only` retains registered source context
+  for audit but is available to company members admitted by shared Access policy.
 - Build editable TWS decks in the Presentations environment with job-specific
   content and reusable layout components. Do not silently substitute a generic
   `python-pptx` template when Presentations is unavailable.

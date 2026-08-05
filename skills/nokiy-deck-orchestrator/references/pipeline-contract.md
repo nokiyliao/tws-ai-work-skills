@@ -58,13 +58,19 @@ the formal customer identity.
 ## TWS Asset Gate
 
 Generate `selection-manifest.json` from the customer profile and deck
-requirements. Run the library verifier with `--selection` and preserve its
-receipt. The build may access only assets listed in the verified manifest.
+requirements. For internal runs, first materialize it from the controlled
+read-only asset service with `scripts/remote_asset_library.py`; preserve both
+the remote verification receipt and the local verifier receipt. The client must
+validate the catalog SHA-256 returned by the service and the catalogued SHA-1
+for every downloaded asset. Any transport, manifest, identity, or digest error
+blocks the build. The build may access only assets listed in the verified
+manifest.
 
 The registry retains asset ID, relative path, digest, evidence level, allowed
 use, reuse scope, and the slide where a designer placed it. Selection does not
 assign a slide. Official, concept, and `customer_only` boundaries are blocking
-rules.
+rules. `customer_only` never controls HTTP authorization for company members;
+Cloudflare Access owns internal access authorization.
 
 ## Copy Gate
 

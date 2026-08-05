@@ -3,9 +3,9 @@
 Production handoff details for this pipeline. Canonical governance (authority
 order, locked assets, hero-image rules, copy discipline, QA gate definitions)
 lives in
-`/Users/nokiy/.codex/skills/nokiy-presentation-generator/references/shared-governance.md`.
+`~/.codex/skills/nokiy-presentation-generator/references/shared-governance.md`.
 All asset and output paths live in
-`/Users/nokiy/.codex/skills/nokiy-presentation-generator/references/assets-manifest.md`.
+`~/.codex/skills/nokiy-presentation-generator/references/assets-manifest.md`.
 Do not restate either here.
 
 ## Skill Coordination
@@ -22,7 +22,10 @@ Do not restate either here.
 Before delegating construction, keep a compact handoff in the scratch build
 note: mode, audience, slide count, slide order, per-slide customer-facing
 claim, source IDs, TWS modules, locked assets, QA level, and whether Decision
-Consistency QA is required. Do not pass internal thesis notes as slide copy.
+Consistency QA is required. When reusable library assets are considered, also
+include the customer profile, deck requirements, and absolute selection
+manifest path. Do not pass internal thesis notes as slide copy, and do not
+assign selected candidates to slides in the selection step.
 
 ## QA Execution
 
@@ -30,15 +33,21 @@ Run the mechanical gate first, on the final file:
 
 ```bash
 PATH="$HOME/.local/bin:$PATH" uv run --with python-pptx python \
-  /Users/nokiy/.codex/skills/nokiy-presentation-generator/scripts/qa_check.py \
+  ~/.codex/skills/nokiy-presentation-generator/scripts/qa_check.py \
   <final>.pptx --mode customer_facing --expect-slides <N> \
   --strict-zone --strict-overlap --strict-discouraged --strict-copy --min-font 10 \
   --build-note <scratch>/build_note.md \
+  [--asset-library <asset-library> \
+   --asset-selection-manifest <scratch>/asset-selection.json] \
   [--locked-asset <path> ...] [--asset-registry <assets/registry.json>] \
   [--rendered-dir <rendered_png_folder> --ocr-rendered] [--allow-video]
 ```
 
 Then the visual layer per the QA level chosen from `shared-governance.md`:
+
+When the selection flags are present, `qa_check.py` first runs the library's
+verifier. A missing file, changed digest/catalog, invalid role, or cross-customer
+`customer_only` asset is a blocking failure; do not continue with a substitute.
 
 - Render all slides to PNG and inspect the contact sheet.
 - Inspect the full-size cover/hero before later steps.

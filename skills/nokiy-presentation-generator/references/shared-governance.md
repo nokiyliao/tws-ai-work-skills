@@ -99,7 +99,7 @@ visible in chat but missing from `$CODEX_HOME/generated_images`, recover it from
 the Codex session JSONL before continuing:
 
 ```bash
-python /Users/nokiy/.codex/skills/nokiy-presentation-generator/scripts/recover_imagegen_outputs.py \
+python ~/.codex/skills/nokiy-presentation-generator/scripts/recover_imagegen_outputs.py \
   --session /path/to/current/session.jsonl \
   --out /path/to/deck/assets/image2_recovered --limit-last 5 \
   --prompt-contains "distinctive scene phrase"
@@ -124,7 +124,10 @@ Prompt requirements:
 
 - `flat vector-style illustration` / `low-realism business illustration`.
 - off-white or warm-white background compatible with TWS deck styling.
-- dark green, charcoal, muted gray, and warm orange accents.
+- BT orange-red as the primary accent, charcoal and muted gray as supporting
+  tones, and off-white/warm-white backgrounds. For rack scenes, use zinc-silver
+  uprights with BT orange-red horizontal beams; do not default to dark green
+  racking.
 - simplified warehouse, rack, WMS/WCS, dock, AGV/AMR, RF/PDA, service, or
   material-flow objects; clean linework and readable negative space.
 - no photorealism, no glossy 3D render, no cinematic lighting, no stock-photo
@@ -135,7 +138,7 @@ Prompt requirements:
 
 Default prompt skeleton:
 
-`Create a 16:9 flat vector-style low-realism business illustration for a TWS warehouse/logistics presentation. Scene: <specific operational scenario>. Use an off-white background, simplified industrial objects, dark green and warm orange accents, clean linework, subtle depth only, and generous negative space for slide text. No photorealism, no glossy 3D rendering, no readable text, no logos, no watermark, no brand names, no fake UI labels.`
+`Create a 16:9 flat vector-style low-realism business illustration for a TWS warehouse/logistics presentation. Scene: <specific operational scenario>. Use an off-white background, simplified industrial objects, BT orange-red as the primary visual accent, charcoal and muted gray support tones, clean linework, subtle depth only, and generous negative space for slide text. In rack scenes, use zinc-silver uprights and BT orange-red horizontal beams. No photorealism, no glossy 3D rendering, no readable text, no logos, no watermark, no brand names, no fake UI labels.`
 
 Do not use generated concept art as product proof. For equipment-selection
 slides, official or user-provided product images remain higher authority than
@@ -168,7 +171,7 @@ errors still require manual inspection.
 
 ### Mandatory Humanizer Gate
 
-Read `/Users/nokiy/.codex/skills/humanizer-zh-tw/SKILL.md` before drafting or
+Read `~/.codex/skills/humanizer-zh-tw/SKILL.md` before drafting or
 rewriting customer-visible copy. Every model-authored or changed title, label,
 table cell, diagram node, footer, closing line, and speaker note must pass that
 review before layout begins. Preserve user-locked wording, numeric claims,
@@ -218,7 +221,7 @@ proposal. Before building the PPTX, run a copy pass:
 - Do not write long title strings joined by `、` or `｜`. If a title needs more
   than one breath, split the slide or move detail into the subtitle.
 - Prefer short labels over customer-visible outcome sentences:
-  `量測通道` beats `AGV 車型評估與現場適用條件`;
+  `通道先量` beats `AGV 車型評估與現場適用條件`;
   `庫存｜任務｜設備` beats `WMS 作業可視化底層建置`.
 - Body copy should be optional. If the visual is clear without the sentence,
   delete the sentence. Never use text to explain an arrow that can be drawn

@@ -20,11 +20,11 @@ Read only the relevant file(s):
 - `references/deck-production-qa.md` — production handoff, output paths, QA
   execution, failure handling.
 - Customer-facing copy method:
-  `/Users/nokiy/.codex/skills/nokiy-presentation-generator/references/customer-copy.md`
+  `~/.codex/skills/nokiy-presentation-generator/references/customer-copy.md`
   — use before writing visible slide copy.
 - Governance (authority order, deletion rule, locked assets, hero images, copy
   and numeric discipline, QA gates) is canonical in
-  `/Users/nokiy/.codex/skills/nokiy-presentation-generator/references/shared-governance.md`
+  `~/.codex/skills/nokiy-presentation-generator/references/shared-governance.md`
   — follow it for every customer-facing deck.
 
 ## Workflow
@@ -76,10 +76,35 @@ site / dock / ESG module as applicable.  11. Traceability and tracking frame.
 
 Detailed structures per mode (8–10 slide cold development, 12-slide
 improvement) live in
-`/Users/nokiy/.codex/skills/nokiy-presentation-generator/references/tws-business-development-deck.md`.
+`~/.codex/skills/nokiy-presentation-generator/references/tws-business-development-deck.md`.
 
 User-provided Markdown specs are contracts; deletion is authoritative
 (`shared-governance.md`).
+
+### 4A. Select Reusable Asset Candidates
+
+After the slide logic is known, create a deck requirements JSON with
+`deck_mode`, intended `purposes`, proposal-specific `focus_tags`, and permitted
+`evidence_levels`. Use it together with the matching customer profile to call
+the verified asset-library selector and write a thread/deck-specific
+`<scratch>/asset-selection.json`:
+
+```bash
+python3 ~/.codex/skills/nokiy-deck-orchestrator/scripts/remote_asset_library.py \
+  --profile <scratch>/customer-profile.json \
+  --requirements <scratch>/deck-requirements.json \
+  --stage <scratch>/assets/remote-library \
+  --verifier <asset-library>/verify_assets.py --limit 6
+```
+
+The administrator configures the service URL, catalog SHA-256 pin, and optional
+Cloudflare Access service-token identity outside this Skill. The local verifier
+path is trusted code, not a source of materials.
+Do not hard-code asset files into this skill. The output is a candidate list,
+not a slide-placement plan; retain that decision for deck design. Keep
+`official` for product evidence and `concept` for de-identified scenarios.
+`customer_only` is retained for selection and audit; it is not an internal
+asset-service access-control mechanism.
 
 ### 5. Copy Discipline
 
@@ -100,6 +125,8 @@ Delegate construction to `nokiy-presentation-generator` (its `tws_pptx.py`
 library and style defaults). Then:
 
 - Run its `scripts/qa_check.py` with the right mode and slide count.
+- Pass `--asset-library` and `--asset-selection-manifest` whenever library
+  candidates are used. This digest/role gate must pass before the deck is used.
 - Apply the QA level from `shared-governance.md` (Light / Standard / Full +
   Decision Consistency for decision and improvement decks).
 - Hero/cover image QA and Image 2.0 style rules are blocking for

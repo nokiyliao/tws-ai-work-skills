@@ -14,8 +14,9 @@ Checks (in one pass over the PPTX):
   8. Text/container containment and visible-object overlap reports.
   9. Locked-asset hash verification against ppt/media/*.
  10. Asset-registry provenance, generated-image role, and media-coverage checks.
- 11. Optional rendered-slide OCR scan for prompt/debug/watermark leakage.
- 12. Embedded video report.
+ 11. Optional asset-library selection manifest digest and role-boundary gate.
+ 12. Optional rendered-slide OCR scan for prompt/debug/watermark leakage.
+ 13. Embedded video report.
 
 Exit code 0 = pass (warnings allowed), 1 = at least one failure.
 
@@ -340,6 +341,10 @@ def main() -> int:
     ap.add_argument("--allow-video", action="store_true")
     ap.add_argument("--asset-registry", type=Path,
                     help="JSON registry for deck assets with source_type, role, allowed_use, sha1, and deck_asset_path")
+    ap.add_argument("--asset-selection-manifest", type=Path,
+                    help="selection manifest to verify before QA uses library assets")
+    ap.add_argument("--asset-library", type=Path,
+                    help="asset-library root containing catalog.json and verify_assets.py")
     ap.add_argument("--build-note", type=Path,
                     help="traceability note for the build: audience, authority inputs, assets, output, and QA level")
     ap.add_argument("--rendered-dir", type=Path, help="Folder containing rendered slide PNG/JPG images for OCR")
@@ -364,6 +369,21 @@ def main() -> int:
 
     def add(level: str, msg: str):
         results.append((level, msg))
+
+    # Fail closed before opening the deck when a library selection is supplied.
+    if bool(args.asset_selection_manifest) != bool(args.asset_library):
+        print("FAIL asset-selection: --asset-selection-manifest and --asset-library must be provided together")
+        return 1
+    if args.asset_selection_manifest:
+        verifier = args.asset_library / "verify_assets.py"
+        command = [sys.executable, str(verifier), "--library", str(args.asset_library),
+                   "--selection", str(args.asset_selection_manifest)]
+        completed = subprocess.run(command, capture_output=True, text=True)
+        if completed.returncode:
+            detail = (completed.stderr or completed.stdout).strip()
+            print(f"FAIL asset-selection: {detail}")
+            return 1
+        add(OK, f"asset-selection: {completed.stdout.strip()}")
 
     # 1. package integrity
     try:

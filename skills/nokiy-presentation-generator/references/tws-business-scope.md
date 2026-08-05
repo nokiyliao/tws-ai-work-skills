@@ -1,6 +1,8 @@
 # TWS Integrated Business Scope
 
-This reference is based on local TWS/奔騰 company presentation files under:
+This reference summarizes TWS/奔騰 business scope for proposal work. Before
+using it externally, compare claims with the current official company and
+product sources available in `<company-data-root>`.
 
 ## Contents
 
@@ -11,27 +13,20 @@ This reference is based on local TWS/奔騰 company presentation files under:
 - Customer issue translation
 - Customer-facing claim discipline
 
-- `/Users/nokiy/Desktop/🏢公司資料/工作文件/產品與規格資料/01_奔騰物流與整體簡介/`
-- `/Users/nokiy/Desktop/🏢公司資料/工作文件/產品與規格資料/02_智慧垂直自動倉儲_Modula/`
-- `/Users/nokiy/Desktop/🏢公司資料/工作文件/產品與規格資料/03_自主移動機器人與洗地機/`
-- `/Users/nokiy/Desktop/🏢公司資料/工作文件/產品與規格資料/04_傳統與自動化堆高機/`
-- `/Users/nokiy/Desktop/🏢公司資料/工作文件/產品與規格資料/05_智慧穿梭車與梭車系統/`
-- `/Users/nokiy/Desktop/🏢公司資料/工作文件/產品與規格資料/06_倉儲料架系統與地坪/`
-- `/Users/nokiy/Desktop/🏢公司資料/工作文件/產品與規格資料/07_物流碼頭與月台設備/`
-- `/Users/nokiy/Desktop/🏢公司資料/工作文件/產品與規格資料/08_倉儲管理與軟體系統/`
+- `<company-data-root>/company-overview/`
+- `<company-data-root>/products/vertical-storage/`
+- `<company-data-root>/products/mobile-robots/`
+- `<company-data-root>/products/material-handling/`
+- `<company-data-root>/products/shuttle-systems/`
+- `<company-data-root>/products/racking-and-flooring/`
+- `<company-data-root>/products/dock-equipment/`
+- `<company-data-root>/products/warehouse-software/`
 
 Use this reference to write TWS customer-facing business development decks.
 
-Representative source decks reviewed:
-
-- `/Users/nokiy/Desktop/🏢公司資料/工作文件/產品與規格資料/01_奔騰物流與整體簡介/TWS奔騰物流簡介/TWS_20251125-Nokiy_完整版美化版.pptx`
-- `/Users/nokiy/Desktop/🏢公司資料/工作文件/產品與規格資料/01_奔騰物流與整體簡介/奔騰物流業務AI協作作戰手冊.pptx`
-- `/Users/nokiy/Desktop/🏢公司資料/工作文件/產品與規格資料/01_奔騰物流與整體簡介/奔騰物流系統股份有限公司-AGV自動化解決方案20251112.pptx`
-- `/Users/nokiy/Desktop/🏢公司資料/工作文件/產品與規格資料/03_自主移動機器人與洗地機/01_AiTEN_海豚之星/業務_自動運搬簡報_1110817.pptx`
-- `/Users/nokiy/Desktop/🏢公司資料/工作文件/產品與規格資料/04_傳統與自動化堆高機/02_BT_瑞典堆高機/06_Vector_VNA_窄通道堆高機/喜提達物流_VNA地坪完整報告_v5.pptx`
-- `/Users/nokiy/Desktop/🏢公司資料/工作文件/產品與規格資料/05_智慧穿梭車與梭車系統/02_Galaxis_凱樂士四向車/奔騰物流四向梭車Bruce_20260525_美化版.pptx`
-- `/Users/nokiy/Desktop/🏢公司資料/工作文件/產品與規格資料/07_物流碼頭與月台設備/碼頭設備/TWS+FastLINK.pptx`
-- `/Users/nokiy/Desktop/🏢公司資料/工作文件/產品與規格資料/08_倉儲管理與軟體系統/WMS/逸盛WMS建置整合專案提案-奔騰物流系統20251106-1.pptx`
+Recommended source groups: current company overview, product introductions,
+official brand assets, equipment specifications, representative project decks,
+and approved customer-facing proposal templates.
 
 ## Core Positioning
 
