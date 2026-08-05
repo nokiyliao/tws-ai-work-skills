@@ -47,7 +47,9 @@ Read the selected skill completely before using its phase:
 Read `references/pipeline-contract.md` before starting a deck run.
 
 Run `scripts/preflight.py --workflow tws-new-factory` before creating a TWS
-job. Any missing skill or asset-library dependency is a blocking failure.
+job. For local fallback, also pass `--asset-library <path>` or set
+`TWS_ASSET_LIBRARY_PATH`. Remote mode uses the configured base URL and pinned
+catalog digest. Any missing dependency is a blocking failure.
 
 For TWS work, validate `input.json` against
 `references/tws-input.schema.json`. Prefer the controlled remote asset service
@@ -64,8 +66,9 @@ copy assets into this Skill or bypass the catalog verifier.
   verification receipt, build manifest, QA reports, deployment receipt, and
   readback evidence in one job directory.
 - For normal internal use, run `scripts/remote_asset_library.py` with the
-  administrator-managed config, customer profile, deck requirements, and the
-  trusted local `verify_assets.py`. It fetches only selected asset IDs, verifies
+  administrator-managed config, customer profile, and deck requirements. A
+  trusted local `verify_assets.py` may be supplied as an additional gate but is
+  not required on learner machines. The client fetches only selected asset IDs, verifies
   the remote catalog SHA-256 and each file SHA-1, and preserves a receipt.
   Network, manifest, identity, or digest failures are blocking failures.
 - Asset placement remains a design decision. The service exposes no filesystem
