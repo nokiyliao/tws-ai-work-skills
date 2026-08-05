@@ -1,0 +1,7 @@
+# Pinned runtime dependencies for TWS AI deck production.
+# Install into the isolated runtime only (never global site-packages).
+# Windows-only package is declared with an environment marker.
+python-pptx==1.0.2
+Pillow==11.1.0
+PyMuPDF==1.25.3
+pywin32==308; sys_platform == "win32"

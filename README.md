@@ -34,10 +34,26 @@ Paste this into a new Codex task:
 請檢查每個 SKILL.md、資料夾結構與相依技能。若已有同名技能，比較版本並保留
 較新的內容；發現衝突時向我說明。
 
-安裝後，請執行 nokiy-deck-orchestrator/scripts/bootstrap_learner.py（不要要求我輸入
-素材庫路徑、hostname、token 或額外登入），自動驗證公司發布的唯讀素材服務。
-接著執行 tws-new-factory 的 remote preflight；只有 bootstrap 與 preflight 都 PASS
-才回報安裝完成，否則請 fail closed 並指出缺少的環境元件。
+安裝 Skill 後，請立刻執行跨平台 runtime bootstrap（不要要求我輸入素材庫路徑、
+hostname、token、Access 登入或本機素材路徑）：
+
+若缺少 Python 3.10+ 或 uv，請先由 Codex 安裝到使用者目錄；不得使用系統管理員
+權限，也不得污染全域 site-packages。
+
+python ~/.codex/skills/nokiy-deck-orchestrator/scripts/runtime_bootstrap.py install
+
+此指令會：
+1. 偵測 Windows/macOS、Python、uv
+2. 在使用者可控的隔離位置建立 runtime（預設 ~/.codex/runtimes/tws-ai）
+3. 依 runtime/requirements.lock 安裝 python-pptx、Pillow、PyMuPDF（Windows 另含 pywin32）
+4. 跑最小 smoke：可開啟 PPTX、渲染/產生一頁 PNG、驗證 OCR engine
+5. 執行遠端素材 bootstrap_learner 與 tws-new-factory remote preflight
+
+Python 與 uv 可由 Codex 安裝到使用者目錄；不要污染全域 site-packages。
+Microsoft Office / LibreOffice / Tesseract 等系統應用不得偽稱已自動安裝；
+若缺少，typed fail closed 並回報精確 blocker（可能需要系統管理員或 GUI 安裝）。
+
+只有 runtime_bootstrap 與 preflight 都 PASS 才回報安裝完成，否則 fail closed。
 ```
 
 Restart ChatGPT after installation so the skills are available in new tasks.
@@ -60,10 +76,36 @@ the origin filesystem remains loopback-only and is never exposed. See
 
 ## Dependencies
 
-The complete deck orchestration flow also uses the installed PDF and
-Presentations capabilities. Codex should report missing dependencies before
-starting a full orchestration task.
+### Isolated Python runtime
+
+Deck production Python packages install into an isolated runtime, never the
+global interpreter:
+
+- Default path: `~/.codex/runtimes/tws-ai` (override with `TWS_AI_RUNTIME_HOME`)
+- Declaration: `skills/nokiy-deck-orchestrator/runtime/requirements.txt`
+- Lockfile: `skills/nokiy-deck-orchestrator/runtime/requirements.lock`
+- Packages: `python-pptx`, `Pillow`, `PyMuPDF`, and Windows-only `pywin32`
+
+Bootstrap and verify:
+
+```bash
+python skills/nokiy-deck-orchestrator/scripts/runtime_bootstrap.py install
+python skills/nokiy-deck-orchestrator/scripts/runtime_bootstrap.py check
+python skills/nokiy-deck-orchestrator/scripts/preflight.py --workflow tws-new-factory
+```
+
+### System applications (not auto-installed)
+
+The complete deck flow also needs a PPTX renderer and OCR on the host:
+
+- Renderer: Microsoft PowerPoint (Windows COM via pywin32) or LibreOffice (`soffice`)
+- PDF rasterizer: Poppler `pdftoppm` and/or PyMuPDF in the isolated runtime
+- OCR: macOS Vision via `swiftc`, or Tesseract on PATH
+
+Missing system tools are blocking failures with typed codes such as
+`SYSTEM_RENDERER_MISSING` and `SYSTEM_OCR_MISSING`. Codex must not report PASS
+when those tools are absent.
 
 ## Version
 
-Current optimized release: `2026.08.05.2`.
+Current optimized release: `2026.08.05.3`.

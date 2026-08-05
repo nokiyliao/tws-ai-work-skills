@@ -46,9 +46,26 @@ Read the selected skill completely before using its phase:
 
 Read `references/pipeline-contract.md` before starting a deck run.
 
+After Skill install, run the cross-platform runtime bootstrap before learner
+work. It detects Windows/macOS, Python, uv, the isolated runtime under
+`~/.codex/runtimes/tws-ai` (or `TWS_AI_RUNTIME_HOME`), Python packages from
+`runtime/requirements.lock`, PPTX renderer, PDF rasterizer, and OCR:
+
+```bash
+python scripts/runtime_bootstrap.py install
+python scripts/runtime_bootstrap.py check
+```
+
+`install` creates the isolated runtime, installs lockfile packages (never
+global site-packages), runs PPTX/PNG/OCR smoke tests, then remote
+`bootstrap_learner.py` and preflight. Office/LibreOffice/Tesseract are not
+auto-installed; missing system tools fail closed with typed blockers.
+
 Run `scripts/preflight.py --workflow tws-new-factory` before creating a TWS
-job. Company learner mode is remote by default and uses administrator-injected
-service configuration. Any missing dependency is a blocking failure.
+job. Preflight checks skills, remote asset config, and real runtime
+imports/renderer/rasterizer/OCR, and prints machine-readable JSON. Company
+learner mode is remote by default and uses administrator-injected service
+configuration. Any missing dependency is a blocking failure.
 
 For TWS work, validate `input.json` against
 `references/tws-input.schema.json`. Prefer the controlled remote asset service

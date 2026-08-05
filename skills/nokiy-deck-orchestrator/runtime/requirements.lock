@@ -1,0 +1,11 @@
+# Reproducible lock for the isolated TWS AI runtime.
+# Generated from requirements.txt pins. Install with:
+#   uv pip install --python <runtime-python> -r requirements.lock
+# Do not install into the global interpreter.
+python-pptx==1.0.2
+Pillow==11.1.0
+PyMuPDF==1.25.3
+lxml==5.3.1
+XlsxWriter==3.2.2
+typing-extensions==4.12.2
+pywin32==308; sys_platform == "win32"
