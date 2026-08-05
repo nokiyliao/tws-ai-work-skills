@@ -12,6 +12,8 @@ Codex skills for TWS customer proposals, editable presentation production, and T
   verified asset selection, visual QA, and mechanical QA.
 - `humanizer-zh-tw`: Taiwan-local copy review with TWS bans on formulaic AI
   sentence patterns.
+- `codex-ppt`: visual sample, full-size rendered-slide inspection, repair
+  loops, and blocking visual acceptance evidence.
 
 CAD drafting, rack layout, and engineering drawing skills are not included in
 this release.
@@ -27,6 +29,7 @@ Paste this into a new Codex task:
 - skills/nokiy-presentation-generator
 - skills/nokiy-deck-orchestrator
 - skills/humanizer-zh-tw
+- skills/codex-ppt
 
 請檢查每個 SKILL.md、資料夾結構與相依技能。若已有同名技能，比較版本並保留
 較新的內容；發現衝突時向我說明。完成後回報安裝結果。
@@ -42,10 +45,10 @@ and `<presenton-root>` with paths available on that computer.
 
 ## Dependencies
 
-The complete deck orchestration flow may also use installed Codex PPT, PDF, and
-Presentations skills. Codex should report missing dependencies before starting
-a full orchestration task.
+The complete deck orchestration flow also uses the installed PDF and
+Presentations capabilities. Codex should report missing dependencies before
+starting a full orchestration task.
 
 ## Version
 
-Current optimized release: `2026.08.04`.
+Current optimized release: `2026.08.05`.

@@ -1,11 +1,12 @@
 {
   "name": "TWS AI Work Skills",
-  "version": "2026.08.04",
+  "version": "2026.08.05",
   "skills": [
     "skills/nokiy-deck-orchestrator",
     "skills/tws-customer-proposal-pipeline",
     "skills/nokiy-presentation-generator",
-    "skills/humanizer-zh-tw"
+    "skills/humanizer-zh-tw",
+    "skills/codex-ppt"
   ],
   "excludedUntilValidated": [
     "CAD drafting",
