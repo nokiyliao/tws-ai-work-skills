@@ -1,6 +1,5 @@
 {
   "base_url": "https://asset-library.example.internal",
   "catalog_sha256": "set-the-current-catalog-sha256-outside-this-skill",
-  "access_client_id": "set-via-environment-preferred",
-  "access_client_secret": "set-via-environment-only"
+  "access_mode": "public"
 }

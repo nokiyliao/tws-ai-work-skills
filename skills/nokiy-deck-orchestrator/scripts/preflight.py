@@ -12,11 +12,27 @@ from pathlib import Path
 HOME = Path.home()
 SKILLS = HOME / ".codex" / "skills"
 DEFAULT_TWS_LIBRARY = os.environ.get("TWS_ASSET_LIBRARY_PATH", "")
+DEFAULT_REMOTE_CONFIG = HOME / ".config" / "tws-ai" / "asset-service.json"
+
+
+def remote_configured() -> tuple[bool, bool]:
+    base_url = os.environ.get("TWS_ASSET_LIBRARY_BASE_URL", "")
+    catalog_pin = os.environ.get("TWS_ASSET_LIBRARY_CATALOG_SHA256", "")
+    if DEFAULT_REMOTE_CONFIG.is_file():
+        try:
+            config = json.loads(DEFAULT_REMOTE_CONFIG.read_text(encoding="utf-8"))
+            base_url = base_url or config.get("base_url", "")
+            catalog_pin = catalog_pin or config.get("catalog_sha256", "")
+        except (OSError, json.JSONDecodeError):
+            pass
+    return bool(base_url), len(catalog_pin) == 64
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--workflow", choices=("general", "tws-new-factory"), default="general")
+    parser.add_argument("--asset-mode", choices=("remote", "local"), default="remote",
+                        help="company learners use remote; local is administrator maintenance only")
     parser.add_argument("--asset-library", type=Path, help="local asset-library root; overrides TWS_ASSET_LIBRARY_PATH")
     args = parser.parse_args()
 
@@ -29,10 +45,12 @@ def main() -> int:
         for name in required
     }
     if args.workflow == "tws-new-factory":
-        if os.environ.get("TWS_ASSET_LIBRARY_BASE_URL"):
+        if args.asset_mode == "remote":
+            has_base_url, has_catalog_pin = remote_configured()
             checks.update({
+                "asset:remote-base-url": has_base_url,
                 "asset:remote-client": (Path(__file__).parent / "remote_asset_library.py").is_file(),
-                "asset:remote-catalog-pin": bool(os.environ.get("TWS_ASSET_LIBRARY_CATALOG_SHA256")),
+                "asset:remote-catalog-pin": has_catalog_pin,
             })
         else:
             library = args.asset_library or (Path(DEFAULT_TWS_LIBRARY) if DEFAULT_TWS_LIBRARY else None)

@@ -94,12 +94,12 @@ python3 ~/.codex/skills/nokiy-deck-orchestrator/scripts/remote_asset_library.py 
   --profile <scratch>/customer-profile.json \
   --requirements <scratch>/deck-requirements.json \
   --stage <scratch>/assets/remote-library \
-  --verifier <asset-library>/verify_assets.py --limit 6
+  --limit 6
 ```
 
-The administrator configures the service URL, catalog SHA-256 pin, and optional
-Cloudflare Access service-token identity outside this Skill. The local verifier
-path is trusted code, not a source of materials.
+The installed Skill carries the company-published service URL and catalog
+SHA-256 pin. Learners never enter a filesystem path, hostname, token, or
+additional login during a presentation task.
 Do not hard-code asset files into this skill. The output is a candidate list,
 not a slide-placement plan; retain that decision for deck design. Keep
 `official` for product evidence and `concept` for de-identified scenarios.
@@ -125,8 +125,8 @@ Delegate construction to `nokiy-presentation-generator` (its `tws_pptx.py`
 library and style defaults). Then:
 
 - Run its `scripts/qa_check.py` with the right mode and slide count.
-- Pass `--asset-library` and `--asset-selection-manifest` whenever library
-  candidates are used. This digest/role gate must pass before the deck is used.
+- Pass the job-local materialized snapshot as `--asset-library` together with
+  `--asset-selection-manifest`. This digest/role gate must pass before use.
 - Apply the QA level from `shared-governance.md` (Light / Standard / Full +
   Decision Consistency for decision and improvement decks).
 - Hero/cover image QA and Image 2.0 style rules are blocking for

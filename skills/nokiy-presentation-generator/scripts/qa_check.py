@@ -44,6 +44,7 @@ from pathlib import Path
 
 from pptx import Presentation
 from pptx.util import Emu
+from asset_snapshot import verify_materialized_selection
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_TERMS = SKILL_ROOT / "data" / "banned_terms.json"
@@ -344,7 +345,7 @@ def main() -> int:
     ap.add_argument("--asset-selection-manifest", type=Path,
                     help="selection manifest to verify before QA uses library assets")
     ap.add_argument("--asset-library", type=Path,
-                    help="asset-library root containing catalog.json and verify_assets.py")
+                    help="job-local materialized asset snapshot containing catalog.json")
     ap.add_argument("--build-note", type=Path,
                     help="traceability note for the build: audience, authority inputs, assets, output, and QA level")
     ap.add_argument("--rendered-dir", type=Path, help="Folder containing rendered slide PNG/JPG images for OCR")
@@ -375,15 +376,12 @@ def main() -> int:
         print("FAIL asset-selection: --asset-selection-manifest and --asset-library must be provided together")
         return 1
     if args.asset_selection_manifest:
-        verifier = args.asset_library / "verify_assets.py"
-        command = [sys.executable, str(verifier), "--library", str(args.asset_library),
-                   "--selection", str(args.asset_selection_manifest)]
-        completed = subprocess.run(command, capture_output=True, text=True)
-        if completed.returncode:
-            detail = (completed.stderr or completed.stdout).strip()
-            print(f"FAIL asset-selection: {detail}")
+        try:
+            detail = verify_materialized_selection(args.asset_library, args.asset_selection_manifest)
+        except (OSError, ValueError, KeyError, json.JSONDecodeError) as exc:
+            print(f"FAIL asset-selection: {exc}")
             return 1
-        add(OK, f"asset-selection: {completed.stdout.strip()}")
+        add(OK, f"asset-selection: {detail}")
 
     # 1. package integrity
     try:

@@ -32,16 +32,31 @@ Paste this into a new Codex task:
 - skills/codex-ppt
 
 請檢查每個 SKILL.md、資料夾結構與相依技能。若已有同名技能，比較版本並保留
-較新的內容；發現衝突時向我說明。完成後回報安裝結果。
+較新的內容；發現衝突時向我說明。
+
+安裝後，請執行 nokiy-deck-orchestrator/scripts/bootstrap_learner.py（不要要求我輸入
+素材庫路徑、hostname、token 或額外登入），自動驗證公司發布的唯讀素材服務。
+接著執行 tws-new-factory 的 remote preflight；只有 bootstrap 與 preflight 都 PASS
+才回報安裝完成，否則請 fail closed 並指出缺少的環境元件。
 ```
 
 Restart ChatGPT after installation so the skills are available in new tasks.
 
-## Local configuration
+## Company learner experience
 
-Edit `skills/nokiy-presentation-generator/references/assets-manifest.md` after
-installation. Replace `<company-data-root>`, `<project-root>`, `<output-root>`,
-and `<presenton-root>` with paths available on that computer.
+Learners paste one installation prompt, open a customer workspace, and
+describe the customer and presentation need in natural language. They do not configure the
+shared asset-library filesystem, selector, verifier, Cloudflare hostname, or
+credentials. The bootstrap reads the bundled non-secret service URL and
+catalog pin, verifies the protected catalog, and writes the local learner
+configuration only after verification succeeds. The orchestrator then obtains
+a controlled job-local snapshot, verifies its catalog and asset digests, and
+passes it to presentation QA.
+
+Company IT publishes the remote service URL and catalog pin in the bundled
+learner environment. The public endpoint exposes only the read-only catalog API;
+the origin filesystem remains loopback-only and is never exposed. See
+`skills/nokiy-deck-orchestrator/references/administrator-asset-maintenance.md`.
 
 ## Dependencies
 
@@ -51,4 +66,4 @@ starting a full orchestration task.
 
 ## Version
 
-Current optimized release: `2026.08.05`.
+Current optimized release: `2026.08.05.2`.

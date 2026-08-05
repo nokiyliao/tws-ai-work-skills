@@ -47,16 +47,16 @@ Read the selected skill completely before using its phase:
 Read `references/pipeline-contract.md` before starting a deck run.
 
 Run `scripts/preflight.py --workflow tws-new-factory` before creating a TWS
-job. For local fallback, also pass `--asset-library <path>` or set
-`TWS_ASSET_LIBRARY_PATH`. Remote mode uses the configured base URL and pinned
-catalog digest. Any missing dependency is a blocking failure.
+job. Company learner mode is remote by default and uses administrator-injected
+service configuration. Any missing dependency is a blocking failure.
 
 For TWS work, validate `input.json` against
 `references/tws-input.schema.json`. Prefer the controlled remote asset service
 configured outside this Skill (see `references/tws-asset-service.config.example.json`).
 It materializes a job-local, digest-verified catalog snapshot before selection.
-The local library is an explicit maintenance/development fallback only; never
-copy assets into this Skill or bypass the catalog verifier.
+The learner workflow must not request a local asset path, service hostname, or
+credential. Local maintenance is documented separately in
+`references/administrator-asset-maintenance.md`.
 
 ## TWS Authority Contract
 
@@ -67,20 +67,20 @@ copy assets into this Skill or bypass the catalog verifier.
   readback evidence in one job directory.
 - For normal internal use, run `scripts/remote_asset_library.py` with the
   administrator-managed config, customer profile, and deck requirements. A
-  trusted local `verify_assets.py` may be supplied as an additional gate but is
-  not required on learner machines. The client fetches only selected asset IDs, verifies
+  trusted local `verify_assets.py` may be supplied by administrators as an
+  additional gate. The client fetches only selected asset IDs and verifies
   the remote catalog SHA-256 and each file SHA-1, and preserves a receipt.
   Network, manifest, identity, or digest failures are blocking failures.
 - Asset placement remains a design decision. The service exposes no filesystem
   paths and `customer_only` is not an HTTP access gate; it remains a selector
   and verifier semantic for audit and suitable reuse.
-- Run `verify_assets.py --selection` against the materialized snapshot before
-  opening or embedding selected assets. Missing files, digest mismatches, and
+- Run the generator QA against the materialized snapshot before opening or
+  embedding selected assets. Missing files, digest mismatches, and
   official/concept role mismatches block the build; `customer_only` remains in
   the receipt as audit metadata, not an internal customer-name access gate.
 - Official assets provide product or capability evidence. Concept assets
   provide scenario context. `customer_only` retains registered source context
-  for audit but is available to company members admitted by shared Access policy.
+  for audit but is not an HTTP authorization gate for the shared teaching library.
 - Build editable TWS decks in the Presentations environment with job-specific
   content and reusable layout components. Do not silently substitute a generic
   `python-pptx` template when Presentations is unavailable.

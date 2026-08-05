@@ -45,9 +45,9 @@ uv run --with python-pptx python \
 
 Then the visual layer per the QA level chosen from `shared-governance.md`:
 
-When the selection flags are present, `qa_check.py` first runs the library's
-verifier. A missing file, changed digest/catalog, invalid role, or cross-customer
-`customer_only` asset is a blocking failure; do not continue with a substitute.
+When the selection flags are present, `qa_check.py` verifies the job-local
+catalog, selection binding, selected files, and digests without accessing the
+source server filesystem. Any mismatch is blocking; do not substitute.
 
 - Render all slides to PNG and inspect the contact sheet.
 - Inspect the full-size cover/hero before later steps.
