@@ -86,7 +86,7 @@ def runtime_checks(runtime_home_path: Path | None = None) -> dict[str, Any]:
         "imports": imports,
         "renderer": _as_map(rb.detect_renderer(win32com_available=(imports.get("modules") or {}).get("win32com"))),
         "rasterizer": _as_map(rb.detect_rasterizer(python_exe=python_exe)),
-        "ocr": _as_map(rb.detect_ocr()),
+        "ocr": _as_map(rb.detect_ocr(python_exe)),
         "platform": _as_map(rb.detect_platform()),
         "uv": _as_map(rb.detect_uv()),
         "python_host": _as_map(rb.detect_python()),

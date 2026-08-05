@@ -45,12 +45,12 @@ python ~/.codex/skills/nokiy-deck-orchestrator/scripts/runtime_bootstrap.py inst
 此指令會：
 1. 偵測 Windows/macOS、Python、uv
 2. 在使用者可控的隔離位置建立 runtime（預設 ~/.codex/runtimes/tws-ai）
-3. 依 runtime/requirements.lock 安裝 python-pptx、Pillow、PyMuPDF（Windows 另含 pywin32）
+3. 依 runtime/requirements.lock 安裝簡報套件與 RapidOCR/ONNX Runtime（Windows 另含 pywin32）
 4. 跑最小 smoke：可開啟 PPTX、渲染/產生一頁 PNG、驗證 OCR engine
 5. 執行遠端素材 bootstrap_learner 與 tws-new-factory remote preflight
 
 Python 與 uv 可由 Codex 安裝到使用者目錄；不要污染全域 site-packages。
-Microsoft Office / LibreOffice / Tesseract 等系統應用不得偽稱已自動安裝；
+Microsoft Office / LibreOffice 等系統應用不得偽稱已自動安裝；
 若缺少，typed fail closed 並回報精確 blocker（可能需要系統管理員或 GUI 安裝）。
 
 只有 runtime_bootstrap 與 preflight 都 PASS 才回報安裝完成，否則 fail closed。
@@ -84,7 +84,7 @@ global interpreter:
 - Default path: `~/.codex/runtimes/tws-ai` (override with `TWS_AI_RUNTIME_HOME`)
 - Declaration: `skills/nokiy-deck-orchestrator/runtime/requirements.txt`
 - Lockfile: `skills/nokiy-deck-orchestrator/runtime/requirements.lock`
-- Packages: `python-pptx`, `Pillow`, `PyMuPDF`, and Windows-only `pywin32`
+- Packages: `python-pptx`, `Pillow`, `PyMuPDF`, `RapidOCR`, `ONNX Runtime`, and Windows-only `pywin32`
 
 Bootstrap and verify:
 
@@ -100,12 +100,12 @@ The complete deck flow also needs a PPTX renderer and OCR on the host:
 
 - Renderer: Microsoft PowerPoint (Windows COM via pywin32) or LibreOffice (`soffice`)
 - PDF rasterizer: Poppler `pdftoppm` and/or PyMuPDF in the isolated runtime
-- OCR: macOS Vision via `swiftc`, or Tesseract on PATH
+- OCR: isolated RapidOCR with ONNX Runtime; macOS Vision and Tesseract are optional preferred alternatives
 
-Missing system tools are blocking failures with typed codes such as
-`SYSTEM_RENDERER_MISSING` and `SYSTEM_OCR_MISSING`. Codex must not report PASS
-when those tools are absent.
+Missing rendering tools remain blocking failures such as
+`SYSTEM_RENDERER_MISSING`. OCR fails closed only when neither the isolated
+RapidOCR engine nor a validated host engine is available.
 
 ## Version
 
-Current optimized release: `2026.08.05.3`.
+Current optimized release: `2026.08.05.4`.

@@ -48,13 +48,25 @@ class RuntimeDiscoveryTest(unittest.TestCase):
         )
         self.assertTrue(renderer["ok"])
 
-        missing_ocr = RB.detect_ocr(platform_name="windows", which_fn=lambda *_: None)
+        missing_ocr = RB.detect_ocr(
+            platform_name="windows",
+            which_fn=lambda *_: None,
+            import_probe=lambda *_: False,
+        )
         self.assertEqual(missing_ocr["blocker"], RB.BLOCKER_OCR)
         ocr = RB.detect_ocr(
             platform_name="windows",
             which_fn=lambda name, *_: "C:/tesseract.exe" if name == "tesseract" else None,
         )
         self.assertTrue(ocr["primary"].startswith("tesseract"))
+        portable_ocr = RB.detect_ocr(
+            python_exe=Path("C:/runtime/python.exe"),
+            platform_name="windows",
+            which_fn=lambda *_: None,
+            import_probe=lambda module, _python: module in {"rapidocr", "onnxruntime"},
+        )
+        self.assertEqual(portable_ocr["primary"], "rapidocr-onnxruntime")
+        self.assertFalse(portable_ocr["admin_or_gui_required"])
 
         missing_rasterizer = RB.detect_rasterizer(
             python_exe=None,
@@ -74,6 +86,24 @@ class RuntimeDiscoveryTest(unittest.TestCase):
         paths = RB.runtime_paths(root)
         self.assertEqual(paths["root"], root)
         self.assertNotIn("/Users/nokiy", str(paths["python"]))
+
+    def test_uv_skips_broken_path_alias_and_uses_real_user_binary(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            real_uv = Path(temp) / "uv.exe"
+            real_uv.write_bytes(b"fixture")
+
+            def fake_version(command, **_kwargs):
+                if command[0] == "C:/broken/uv.exe":
+                    raise OSError("broken alias")
+                return "uv 0.12.0\n"
+
+            with mock.patch.object(RB.subprocess, "check_output", side_effect=fake_version):
+                result = RB.detect_uv(
+                    which_fn=lambda *_: "C:/broken/uv.exe",
+                    candidate_paths=[real_uv],
+                )
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["path"], str(real_uv))
 
 
 class RuntimeBehaviorTest(unittest.TestCase):
@@ -120,10 +150,25 @@ class RuntimeBehaviorTest(unittest.TestCase):
 
     def test_locked_dependencies_are_pinned_and_portable(self) -> None:
         text = (RUNTIME_DIR / "requirements.lock").read_text(encoding="utf-8")
-        for package in ("python-pptx==", "Pillow==", "PyMuPDF==", "pywin32=="):
+        for package in ("python-pptx==", "pillow==", "pymupdf==", "rapidocr==", "onnxruntime==", "pywin32=="):
             self.assertIn(package, text)
         self.assertIn("sys_platform", text)
         self.assertNotIn("/Users/", text)
+
+    def test_rapidocr_smoke_uses_isolated_python(self) -> None:
+        completed = subprocess.CompletedProcess([], 0, '{"texts": ["TWS AI runtime smoke"]}\n', "")
+        with mock.patch.object(RB.subprocess, "run", return_value=completed) as invoked:
+            result = RB.smoke_ocr(
+                Path("slide.png"),
+                {
+                    "ok": True,
+                    "primary": "rapidocr-onnxruntime",
+                    "engines": ["rapidocr-onnxruntime"],
+                    "python": "C:/Users/student/.codex/runtimes/tws-ai/venv/Scripts/python.exe",
+                },
+            )
+        self.assertTrue(result["ok"])
+        self.assertEqual(invoked.call_args.args[0][0], "C:/Users/student/.codex/runtimes/tws-ai/venv/Scripts/python.exe")
 
 
 class PreflightTest(unittest.TestCase):

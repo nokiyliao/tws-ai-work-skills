@@ -20,6 +20,7 @@ import json
 import os
 import platform
 import shutil
+import site
 import subprocess
 import sys
 import tempfile
@@ -165,34 +166,68 @@ def which(name: str, path: str | None = None) -> str | None:
 def detect_uv(
     path_env: str | None = None,
     which_fn: Callable[..., str | None] | None = None,
+    candidate_paths: list[Path] | None = None,
 ) -> dict[str, Any]:
     if which_fn is not None:
         path = which_fn("uv", path_env)
     else:
         path = which_tool("uv", path_env=path_env)
-    if not path:
+    executable = "uv.exe" if sys.platform == "win32" else "uv"
+    if candidate_paths is None:
         candidates = [
-            Path.home() / ".local" / "bin" / ("uv.exe" if sys.platform == "win32" else "uv"),
-            Path.home() / ".cargo" / "bin" / ("uv.exe" if sys.platform == "win32" else "uv"),
+            Path.home() / ".local" / "bin" / executable,
+            Path.home() / ".cargo" / "bin" / executable,
+            Path(site.getuserbase()) / ("Scripts" if sys.platform == "win32" else "bin") / executable,
         ]
-        for candidate in candidates:
-            if candidate.is_file():
-                path = str(candidate)
-                break
+        if sys.platform == "win32":
+            local_app_data = os.environ.get("LOCALAPPDATA", "").strip()
+            if local_app_data:
+                local = Path(local_app_data)
+                candidates.extend(
+                    [
+                        local / "Programs" / "uv" / executable,
+                        local / "uv" / executable,
+                        local / "Microsoft" / "WinGet" / "Links" / executable,
+                    ]
+                )
+    else:
+        candidates = candidate_paths
+
+    probes: list[str] = []
+    if path:
+        probes.append(str(path))
+    probes.extend(str(candidate) for candidate in candidates if candidate.is_file())
+    seen: set[str] = set()
+    for probe in probes:
+        normalized = os.path.normcase(os.path.abspath(probe))
+        if normalized in seen:
+            continue
+        seen.add(normalized)
+        try:
+            version = subprocess.check_output([probe, "--version"], text=True, timeout=30).strip()
+        except (OSError, subprocess.SubprocessError):
+            continue
+        return {"ok": True, "path": probe, "version": version, "blocker": None, "detail": None}
+
+    if not probes:
+        detail = "uv executable not found"
+    else:
+        detail = "all discovered uv executables failed to run"
     if not path:
         return {
             "ok": False,
             "path": None,
             "version": None,
             "blocker": BLOCKER_UV,
-            "detail": "uv not found; Codex may install uv into ~/.local/bin without admin rights",
+            "detail": f"{detail}; Codex may install uv into the user directory without admin rights",
         }
-    version = None
-    try:
-        version = subprocess.check_output([path, "--version"], text=True, timeout=30).strip()
-    except (OSError, subprocess.SubprocessError):
-        version = "unknown"
-    return {"ok": True, "path": path, "version": version, "blocker": None, "detail": None}
+    return {
+        "ok": False,
+        "path": None,
+        "version": None,
+        "blocker": BLOCKER_UV,
+        "detail": f"{detail}; reinstall uv into the user directory without admin rights",
+    }
 
 
 def detect_renderer(
@@ -318,10 +353,12 @@ def detect_rasterizer(
 
 
 def detect_ocr(
+    python_exe: Path | None = None,
     *,
     which: Callable[[str], str | None] | None = None,
     which_fn: Callable[..., str | None] | None = None,
     platform_name: str | None = None,
+    import_probe: Callable[[str, Path | None], bool] | None = None,
 ) -> dict[str, Any]:
     plat = platform_name or sys.platform
 
@@ -338,6 +375,9 @@ def detect_ocr(
     tesseract = find("tesseract")
     if tesseract:
         engines.append(f"tesseract:{tesseract}")
+    probe = import_probe or (lambda module, exe: _module_importable(module, exe))
+    if probe("rapidocr", python_exe) and probe("onnxruntime", python_exe):
+        engines.append("rapidocr-onnxruntime")
 
     if engines:
         return {
@@ -351,8 +391,8 @@ def detect_ocr(
         }
 
     detail = (
-        "no OCR engine available; on macOS install Xcode CLT (swiftc) for Vision, "
-        "or install Tesseract on Windows/macOS. OCR engines are not auto-installed."
+        "no OCR engine available; the isolated runtime must contain RapidOCR and "
+        "ONNX Runtime, or the host must provide macOS Vision/Tesseract"
     )
     return {
         "ok": False,
@@ -360,8 +400,8 @@ def detect_ocr(
         "primary": None,
         "blocker": BLOCKER_OCR,
         "detail": detail,
-        "admin_or_gui": True,
-        "admin_or_gui_required": True,
+        "admin_or_gui": False,
+        "admin_or_gui_required": False,
     }
 
 
@@ -395,6 +435,8 @@ def detect_imports(
         "pptx": "python-pptx",
         "PIL": "Pillow",
         "fitz": "PyMuPDF",
+        "rapidocr": "rapidocr",
+        "onnxruntime": "onnxruntime",
     }
     plat = platform_name or sys.platform
     if plat in {"win32", "windows"}:
@@ -655,6 +697,39 @@ def smoke_ocr(image_path: Path, ocr_info: dict[str, Any] | Any) -> dict[str, Any
                 "blocker": None if ok else BLOCKER_SMOKE,
                 "detail": None if ok else ((result.stderr or result.stdout or "Vision OCR smoke failed").strip()),
             }
+        if primary == "rapidocr-onnxruntime":
+            python_exe = str(ocr_info.get("python") or sys.executable)
+            script = (
+                "import json, sys\n"
+                "from rapidocr import RapidOCR\n"
+                "result = RapidOCR()(sys.argv[1])\n"
+                "texts = getattr(result, 'txts', None)\n"
+                "if texts is None:\n"
+                "    texts = []\n"
+                "    for row in (result or []):\n"
+                "        if isinstance(row, (list, tuple)) and len(row) > 1:\n"
+                "            texts.append(str(row[1]))\n"
+                "print(json.dumps({'texts': list(texts)}, ensure_ascii=True))\n"
+            )
+            result = subprocess.run(
+                [python_exe, "-c", script, str(image_path)],
+                text=True,
+                capture_output=True,
+                timeout=180,
+            )
+            try:
+                payload = json.loads((result.stdout or "").strip().splitlines()[-1])
+            except (json.JSONDecodeError, IndexError):
+                payload = {"texts": []}
+            texts = [str(value) for value in payload.get("texts") or []]
+            ok = result.returncode == 0 and bool(texts)
+            return {
+                "ok": ok,
+                "engine": "rapidocr-onnxruntime",
+                "text_preview": " ".join(texts)[:120],
+                "blocker": None if ok else BLOCKER_SMOKE,
+                "detail": None if ok else ((result.stderr or result.stdout or "RapidOCR smoke failed").strip()),
+            }
         return {
             "ok": False,
             "engine": primary,
@@ -754,7 +829,7 @@ def build_report(
         "failed": [b["check"] for b in blockers],
         "notes": [
             "Python packages install only into the isolated runtime; the global interpreter is never modified.",
-            "Office, LibreOffice, and Tesseract are never auto-installed; missing tools are typed blockers.",
+            "RapidOCR runs from the isolated runtime; host Vision/Tesseract remain optional alternatives.",
             "Student assets remain remote-only via the published HTTPS Tunnel API.",
         ],
     }
@@ -783,7 +858,7 @@ def run_check(home: Path, *, skip_remote: bool = False) -> dict[str, Any]:
         "imports": imports,
         "renderer": detect_renderer(win32com_available=imports["modules"].get("win32com")),
         "rasterizer": detect_rasterizer(python_exe=python_for_imports),
-        "ocr": detect_ocr(),
+        "ocr": detect_ocr(python_for_imports),
     }
     if not skip_remote:
         checks["remote_bootstrap"] = run_remote_bootstrap()
@@ -815,7 +890,8 @@ def run_install(home: Path, *, skip_remote: bool = False, skip_smoke: bool = Fal
     checks["imports"] = detect_imports(paths["python"])
     checks["renderer"] = detect_renderer(win32com_available=checks["imports"]["modules"].get("win32com"))
     checks["rasterizer"] = detect_rasterizer(python_exe=paths["python"])
-    checks["ocr"] = detect_ocr()
+    checks["ocr"] = detect_ocr(paths["python"])
+    checks["ocr"]["python"] = str(paths["python"])
 
     if not skip_smoke:
         with tempfile.TemporaryDirectory(prefix="tws-ai-smoke-") as temp:

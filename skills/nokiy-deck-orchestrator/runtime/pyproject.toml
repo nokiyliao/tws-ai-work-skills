@@ -1,12 +1,14 @@
 [project]
 name = "tws-ai-runtime"
-version = "2026.08.05.3"
+version = "2026.08.05.4"
 description = "Isolated Python dependencies for TWS AI deck production"
 requires-python = ">=3.10"
 dependencies = [
   "python-pptx==1.0.2",
   "Pillow==11.1.0",
   "PyMuPDF==1.25.3",
+  "rapidocr==3.9.1",
+  "onnxruntime==1.22.1",
   "pywin32==308; sys_platform == 'win32'",
 ]
 

@@ -49,7 +49,9 @@ Read `references/pipeline-contract.md` before starting a deck run.
 After Skill install, run the cross-platform runtime bootstrap before learner
 work. It detects Windows/macOS, Python, uv, the isolated runtime under
 `~/.codex/runtimes/tws-ai` (or `TWS_AI_RUNTIME_HOME`), Python packages from
-`runtime/requirements.lock`, PPTX renderer, PDF rasterizer, and OCR:
+`runtime/requirements.lock`, PPTX renderer, PDF rasterizer, and OCR. Windows
+and macOS both receive RapidOCR/ONNX Runtime inside the isolated runtime;
+Vision and Tesseract are optional host alternatives:
 
 ```bash
 python scripts/runtime_bootstrap.py install
@@ -58,8 +60,8 @@ python scripts/runtime_bootstrap.py check
 
 `install` creates the isolated runtime, installs lockfile packages (never
 global site-packages), runs PPTX/PNG/OCR smoke tests, then remote
-`bootstrap_learner.py` and preflight. Office/LibreOffice/Tesseract are not
-auto-installed; missing system tools fail closed with typed blockers.
+`bootstrap_learner.py` and preflight. Office/LibreOffice are not auto-installed;
+missing system rendering tools fail closed with typed blockers.
 
 Run `scripts/preflight.py --workflow tws-new-factory` before creating a TWS
 job. Preflight checks skills, remote asset config, and real runtime
