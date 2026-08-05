@@ -26,11 +26,13 @@ REQUIRED = [
     ROOT / "skills/nokiy-deck-orchestrator/scripts/runtime_bootstrap.py",
     ROOT / "skills/nokiy-deck-orchestrator/scripts/preflight.py",
     ROOT / "skills/nokiy-deck-orchestrator/scripts/bootstrap_learner.py",
+    ROOT / "skills/nokiy-deck-orchestrator/scripts/deck_pipeline_state.py",
     ROOT / "skills/nokiy-deck-orchestrator/runtime/requirements.lock",
     ROOT / "skills/nokiy-deck-orchestrator/runtime/requirements.txt",
     ROOT / "skills/nokiy-deck-orchestrator/runtime/pyproject.toml",
     ROOT / "tests/test_runtime_bootstrap.py",
     ROOT / "tests/test_learner_bootstrap.py",
+    ROOT / "tests/test_skill_routing.py",
     ROOT / "README.md",
     ROOT / "manifest.json",
 ]

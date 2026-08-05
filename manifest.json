@@ -1,6 +1,6 @@
 {
   "name": "TWS AI Work Skills",
-  "version": "2026.08.05.4",
+  "version": "2026.08.05.5",
   "skills": [
     "skills/nokiy-deck-orchestrator",
     "skills/tws-customer-proposal-pipeline",
@@ -8,6 +8,18 @@
     "skills/humanizer-zh-tw",
     "skills/codex-ppt"
   ],
+  "routing": {
+    "presentationEntryPoint": "skills/nokiy-deck-orchestrator",
+    "internalPresentationPhases": [
+      "skills/tws-customer-proposal-pipeline",
+      "skills/nokiy-presentation-generator",
+      "skills/codex-ppt"
+    ],
+    "supportingSkills": [
+      "skills/humanizer-zh-tw"
+    ],
+    "stateContract": "tws_deck_routing_v1"
+  },
   "excludedUntilValidated": [
     "CAD drafting",
     "rack layout",

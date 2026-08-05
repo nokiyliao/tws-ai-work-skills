@@ -1,9 +1,22 @@
 ---
 name: tws-customer-proposal-pipeline
-description: Decide WHAT a TWS/TWSC/奔騰物流 proposal deck for a NAMED target customer should say — research the company's public signals (news, expansion, ERP/MES/ESG), form an opportunity thesis, choose the engagement mode and slide logic, couple signals to TWS services (WMS/WCS, racks, Modula, AGV/AMR, Galaxis, dock, LionsBot), and enforce customer-facing copy discipline. Use when the user names a target customer and wants a proposal, cold-development deck, improvement proposal, or decision deck, especially with a news URL, company website, or reference deck. Delegates PPTX construction and styling to nokiy-presentation-generator.
+description: INTERNAL-ONLY strategy phase for a TWS named-customer deck already routed by nokiy-deck-orchestrator. Do not use directly for a user's request to create, revise, validate, or deliver a 簡報/PPT/PPTX/deck. Use only after the orchestrator has initialized deck_pipeline_state.json and delegated the proposal phase; then research public signals, form the opportunity thesis, map TWS services, and return structured proposal evidence without building or delivering a PPTX.
 ---
 
 # TWS Customer Proposal Pipeline
+
+## Invocation Boundary
+
+Before doing research or writing slide logic, run the orchestrator state guard:
+
+```bash
+python ~/.codex/skills/nokiy-deck-orchestrator/scripts/deck_pipeline_state.py \
+  route --run-dir <run-dir> --phase proposal
+```
+
+If the state file is absent or the guard fails, stop this skill and route the
+original presentation request to `nokiy-deck-orchestrator`. Do not initialize a
+replacement run, build slides, or claim completion here.
 
 Own the customer thesis, proposal structure, source discipline, and TWS service
 coupling. File construction, styling, layout library, and the mechanical QA

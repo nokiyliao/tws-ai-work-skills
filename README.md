@@ -58,6 +58,14 @@ Microsoft Office / LibreOffice 等系統應用不得偽稱已自動安裝；
 
 Restart ChatGPT after installation so the skills are available in new tasks.
 
+## Presentation routing
+
+`nokiy-deck-orchestrator` is the only user-facing entry point for creating,
+revising, validating, delivering, or publishing a presentation. The proposal
+pipeline, editable generator, and Codex-PPT are internal phases and require a
+passing `deck_pipeline_state.py route` guard. The routing contract is declared
+in `manifest.json` and validated by the repository test suite.
+
 ## Company learner experience
 
 Learners paste one installation prompt, open a customer workspace, and
@@ -108,4 +116,4 @@ RapidOCR engine nor a validated host engine is available.
 
 ## Version
 
-Current optimized release: `2026.08.05.4`.
+Current optimized release: `2026.08.05.5`.

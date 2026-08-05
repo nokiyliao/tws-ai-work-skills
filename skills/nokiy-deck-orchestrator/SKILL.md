@@ -1,9 +1,16 @@
 ---
 name: nokiy-deck-orchestrator
-description: The authoritative entry point for Nokiy and TWS presentations. Use whenever the user says 做簡報, 做新廠簡報, 建立客戶簡報, 做客戶提案, 重做簡報, 修改簡報, 更新簡報, 發布簡報, or asks to create, rebuild, revise, validate, publish, download, or register a PPT/PPTX/deck. Orchestrates case identity, proposal strategy, Humanizer review, verified asset selection, editable Presentations construction, visual and mechanical QA, versioned delivery, Mini upload, and presentation_jobs readback without allowing silent builder substitution.
+description: ONLY USER-FACING ENTRY POINT for every Nokiy/TWS/TWSC/奔騰物流 presentation task. ALWAYS use this skill first when a user asks to create, generate, revise, rebuild, restyle, validate, deliver, publish, download, or register a 簡報/PPT/PPTX/deck, including named-customer proposals and natural requests such as 做簡報、做新廠簡報、建立客戶簡報、做客戶提案、重做或修改簡報. Do not start with tws-customer-proposal-pipeline, nokiy-presentation-generator, codex-ppt, or humanizer-zh-tw; this orchestrator invokes them as internal phases after runtime preflight and run-state initialization.
 ---
 
 # Nokiy Deck Orchestrator
+
+## Routing Invariant
+
+This is the single user-facing presentation router. Start here even when the
+prompt appears to match a strategy, construction, copy, or visual subskill more
+specifically. Initialize `deck_pipeline_state.json` before delegating any phase.
+Never let a subskill create a parallel run or choose a different final builder.
 
 ## Natural-Language Triggers
 
@@ -45,6 +52,16 @@ Read the selected skill completely before using its phase:
   `~/.codex/skills/pdf/SKILL.md`
 
 Read `references/pipeline-contract.md` before starting a deck run.
+
+Every delegated phase must pass the state guard before its supporting skill
+runs:
+
+```bash
+python scripts/deck_pipeline_state.py route --run-dir <run-dir> --phase <phase>
+```
+
+Use `proposal`, `copy`, `sample`, `build`, `visual_qa`, or `mechanical_qa` as
+the phase. A failed guard means routing is invalid and blocks that subskill.
 
 After Skill install, run the cross-platform runtime bootstrap before learner
 work. It detects Windows/macOS, Python, uv, the isolated runtime under

@@ -1,4 +1,4 @@
 interface:
   display_name: "簡報視覺驗收"
   short_description: "建立簡報視覺樣稿並執行逐頁渲染驗收、缺陷修復與證據保存"
-  default_prompt: "請使用 $codex-ppt 建立視覺樣稿、檢查全部渲染頁面並保存驗收證據。"
+  default_prompt: "僅執行既有 nokiy-deck-orchestrator run 所委派的 sample 或 visual_qa phase；先驗證 route guard，再檢查全部渲染頁面並保存驗收證據，不得取代完整簡報管線。"

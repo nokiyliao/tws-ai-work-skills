@@ -1,9 +1,23 @@
 ---
 name: nokiy-presentation-generator
-description: Construct, restyle, fix, or verify editable PPTX files for Nokiy/TWS/TWSC/奔騰物流 — layout, python-pptx build scripts, Markdown-to-PPTX conversion, shared layout library, and mechanical QA. Use when the deck content/strategy is already decided and slides need to be built or revised. For deciding WHAT a proposal for a named target customer should say (research, opportunity thesis, slide logic), use tws-customer-proposal-pipeline, which delegates file construction to this skill.
+description: INTERNAL-ONLY editable-build and mechanical-QA phase for a presentation already routed by nokiy-deck-orchestrator. Do not use directly for a user's request to create, revise, restyle, validate, or deliver a Nokiy/TWS/TWSC/奔騰物流 簡報/PPT/PPTX/deck. Use only with an orchestrator-owned deck_pipeline_state.json whose build delegation passes; consume approved copy, proposal and verified assets, construct the editable PPTX, and return build/QA evidence without publishing or declaring the full task complete.
 ---
 
 # Nokiy Presentation Generator
+
+## Invocation Boundary
+
+Before creating/modifying a TWS PPTX or running final mechanical QA, require the
+orchestrator run directory and execute the matching guard:
+
+```bash
+python ~/.codex/skills/nokiy-deck-orchestrator/scripts/deck_pipeline_state.py \
+  route --run-dir <run-dir> --phase <build-or-mechanical_qa>
+```
+
+If the guard fails, stop and route the original request to
+`nokiy-deck-orchestrator`. Do not infer missing strategy, select a parallel
+builder, or create an untracked deck.
 
 Produce editable PPTX decks from briefs, Markdown, project files, or structured
 analysis. Default to customer-facing TWS/TWSC decks that position 奔騰物流 as a

@@ -44,6 +44,8 @@ PREREQUISITES = {
     "register": ("deploy",),
     "readback": ("register",),
 }
+ENTRY_SKILL = "nokiy-deck-orchestrator"
+ROUTABLE_PHASES = ("proposal", "copy", "sample", "build", "visual_qa", "mechanical_qa")
 
 
 def now() -> str:
@@ -110,6 +112,30 @@ def phase_ok(state: dict, phase: str) -> bool:
     return False
 
 
+def delegation_errors(state: dict, phase: str) -> list[str]:
+    """Validate that an internal presentation skill has an orchestrator handoff."""
+    errors: list[str] = []
+    if state.get("schema_version") != 3:
+        errors.append("state schema_version must be 3; reinitialize with the current orchestrator")
+    routing = state.get("routing") or {}
+    if routing.get("entry_skill") != ENTRY_SKILL:
+        errors.append(f"routing.entry_skill must be {ENTRY_SKILL}")
+    if phase not in ROUTABLE_PHASES:
+        errors.append(f"phase is not delegatable: {phase}")
+        return errors
+    phases = state.get("phases") or {}
+    if phase not in phases:
+        errors.append(f"state has no phase: {phase}")
+        return errors
+    for prerequisite in PREREQUISITES.get(phase, ()):
+        if prerequisite not in phases or not phase_ok(state, prerequisite):
+            status = phases.get(prerequisite, {}).get("status", "missing")
+            errors.append(f"prerequisite {prerequisite} is {status}")
+    if phases[phase].get("status") not in {"pending", "fail"}:
+        errors.append(f"phase {phase} is {phases[phase].get('status')}; no new delegation is open")
+    return errors
+
+
 def cmd_init(args: argparse.Namespace) -> int:
     run_dir = Path(args.run_dir).expanduser().resolve()
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -127,7 +153,11 @@ def cmd_init(args: argparse.Namespace) -> int:
     pdf_status = "pending" if args.pdf_requested else "skipped"
     tws_only = {"case_lock", "proposal", "asset_selection", "asset_verification", "deploy", "register", "readback"}
     state = {
-        "schema_version": 2,
+        "schema_version": 3,
+        "routing": {
+            "entry_skill": ENTRY_SKILL,
+            "contract": "tws_deck_routing_v1",
+        },
         "workflow": args.workflow,
         "mode": args.mode,
         "job_id": args.job_id or input_data.get("job_id") or run_dir.name,
@@ -223,6 +253,20 @@ def cmd_show(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_route(args: argparse.Namespace) -> int:
+    path, state = load(args.run_dir)
+    errors = delegation_errors(state, args.phase)
+    report = {
+        "status": "FAIL" if errors else "PASS",
+        "entry_skill": (state.get("routing") or {}).get("entry_skill"),
+        "phase": args.phase,
+        "state": str(path),
+        "errors": errors,
+    }
+    print(json.dumps(report, ensure_ascii=True, indent=2))
+    return 1 if errors else 0
+
+
 def parser() -> argparse.ArgumentParser:
     root = argparse.ArgumentParser(description=__doc__)
     commands = root.add_subparsers(dest="command", required=True)
@@ -256,6 +300,11 @@ def parser() -> argparse.ArgumentParser:
     show = commands.add_parser("show")
     show.add_argument("--run-dir", required=True)
     show.set_defaults(func=cmd_show)
+
+    route = commands.add_parser("route", help="verify orchestrator delegation before an internal skill runs")
+    route.add_argument("--run-dir", required=True)
+    route.add_argument("--phase", choices=ROUTABLE_PHASES, required=True)
+    route.set_defaults(func=cmd_route)
     return root
 
 

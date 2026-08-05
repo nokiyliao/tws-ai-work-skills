@@ -1,4 +1,4 @@
 interface:
   display_name: "做簡報"
   short_description: "建立、修改、檢查與發布 TWS 客戶簡報的統一管線"
-  default_prompt: "請用權威簡報管線處理這份簡報，保留案件資料、素材驗證、雙重 QA 與發布讀回證據。"
+  default_prompt: "請從唯一簡報入口開始處理這個任務：先做 runtime preflight 並建立 orchestrator run state，再依序委派提案、文案、素材、可編輯建置、視覺與機械 QA；不得直接跳到任何子技能。"

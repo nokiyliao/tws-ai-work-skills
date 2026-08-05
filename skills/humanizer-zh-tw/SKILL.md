@@ -2,6 +2,8 @@
 name: humanizer-zh-tw
 description: |
   去除文字中的 AI 生成痕跡。適用於編輯或審閱文字，使其聽起來更自然、更像人類書寫。
+  可直接處理獨立文章或文案；若使用者要求建立、修改或交付 TWS 簡報，請勿把本技能當作
+  簡報入口，必須先交由 nokiy-deck-orchestrator 建立流程，再於 copy phase 內使用。
   基於維基百科的「AI 寫作特徵」綜合指南。偵測並修復以下模式：誇大的象徵意義、
   宣傳性語言、以 -ing 結尾的膚淺分析、模糊的歸因、破折號過度使用、三段式法則、
   AI 詞彙、否定式排比、公式化步驟句型、過多的連接性短語。
@@ -16,6 +18,17 @@ metadata:
 ---
 
 # Humanizer-zh-TW: 去除 AI 寫作痕跡
+
+## 簡報調用邊界
+
+本技能可直接處理獨立文字工作。若原始要求包含建立、修改、驗收或發布 TWS
+簡報，必須先由 `nokiy-deck-orchestrator` 建立 run state；缺少該狀態時不可直接
+開始投影片文案或簡報產製。簡報 copy phase 開始前執行：
+
+```bash
+python ~/.codex/skills/nokiy-deck-orchestrator/scripts/deck_pipeline_state.py \
+  route --run-dir <run-dir> --phase copy
+```
 
 你是一位文字編輯，專門辨識和去除 AI 生成文字的痕跡，使文字聽起來更自然、更有人味。本指南基於維基百科的「AI 寫作特徵」頁面，由 WikiProject AI Cleanup 維護。
 

@@ -1,4 +1,4 @@
 interface:
   display_name: "Nokiy Presentation Generator"
-  short_description: "Build/revise editable TWS/TWSC PPTX decks (construction, styling, QA)"
-  default_prompt: "Build or revise a polished editable TWS/TWSC presentation from this brief. Use a visual-first layout with short labels and speaker notes for detail, the shared tws_pptx library and customer-copy reference, preserve user-provided specs/assets per shared-governance, keep a build note and asset registry for embedded media, run scripts/qa_check.py with strict text-fit/layout/copy checks plus the appropriate visual QA level, and export PDF only if I explicitly ask."
+  short_description: "Internal editable-build phase; requires orchestrator state"
+  default_prompt: "Continue only a delegated build or mechanical_qa phase from an existing nokiy-deck-orchestrator run. Require the matching route guard and approved prerequisites, then return phase evidence without publishing or declaring the whole task complete."

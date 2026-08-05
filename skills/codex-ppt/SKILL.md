@@ -1,9 +1,23 @@
 ---
 name: codex-ppt
-description: Visual direction and blocking acceptance for presentation decks. Use when Codex must create a visual sample, review rendered PPT/PPTX slides, repair visual defects, validate image-mode slides, or decide whether a deck passes visual QA. For TWS customer decks, act as the visual authority inside nokiy-deck-orchestrator without replacing its editable builder, source checks, asset verification, or mechanical QA.
+description: INTERNAL-ONLY visual-sample and rendered-slide QA phase for Nokiy/TWS presentations routed by nokiy-deck-orchestrator. Do not use directly to fulfill a user's request for a complete 簡報/PPT/PPTX/deck. Use only when the orchestrator delegates sample or visual_qa with deck_pipeline_state.json, except an explicitly visual-only review of an existing non-TWS deck. Never replace the editable builder, source/asset checks, mechanical QA, delivery, or publication pipeline.
 ---
 
 # Codex PPT
+
+## Invocation Boundary
+
+For a TWS deck, require the orchestrator run directory. Before work execute the
+guard with `sample` for the approved visual sample or `visual_qa` for final
+rendered acceptance:
+
+```bash
+python ~/.codex/skills/nokiy-deck-orchestrator/scripts/deck_pipeline_state.py \
+  route --run-dir <run-dir> --phase <sample-or-visual_qa>
+```
+
+If the guard fails, return control to `nokiy-deck-orchestrator`; do not build or
+deliver a complete deck from this skill.
 
 Own visual direction and rendered-slide acceptance. Judge pixels, composition,
 hierarchy, image quality, and cross-slide rhythm. Do not claim source accuracy,

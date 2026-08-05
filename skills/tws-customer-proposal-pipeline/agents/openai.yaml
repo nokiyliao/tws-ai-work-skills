@@ -1,4 +1,4 @@
 interface:
   display_name: "TWS Customer Proposal Pipeline"
-  short_description: "Build TWS customer proposal decks"
-  default_prompt: "Create or revise a customer-facing TWS proposal deck. First classify the engagement mode and authority materials, then map the opportunity to TWS services, preserve any user-provided specs/assets, and produce an editable PPTX with render/text/image QA."
+  short_description: "Internal proposal strategy phase; requires orchestrator state"
+  default_prompt: "Continue only the delegated proposal phase from an existing nokiy-deck-orchestrator run. Require the run directory and a passing route guard, then return structured strategy evidence; do not build or deliver a PPTX."
