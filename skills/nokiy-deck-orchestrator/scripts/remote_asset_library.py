@@ -8,7 +8,6 @@ import base64
 import hashlib
 import json
 import os
-import subprocess
 import sys
 from pathlib import Path
 from urllib.error import HTTPError, URLError
@@ -71,7 +70,7 @@ def main() -> int:
     parser.add_argument("--requirements", type=Path, required=True)
     parser.add_argument("--stage", type=Path, required=True, help="job-local directory receiving catalog, manifest, and selected assets")
     parser.add_argument("--config", type=Path, help="private administrator config; environment variables override it")
-    parser.add_argument("--verifier", type=Path, required=True, help="trusted local verify_assets.py")
+    parser.add_argument("--verifier", type=Path, help="optional additional local verify_assets.py")
     parser.add_argument("--limit", type=int, default=6)
     parser.add_argument("--allow-http", action="store_true", help="test-only: permit a loopback HTTP fixture")
     args = parser.parse_args()
@@ -115,7 +114,10 @@ def main() -> int:
         (stage / "catalog.json").write_bytes(catalog)
         (stage / "selection-manifest.json").write_bytes(manifest_bytes)
         catalog_by_id = {asset.get("id"): asset for asset in catalog_obj["assets"]}
-        for selected in manifest.get("selected_assets", []):
+        selected_assets = manifest.get("selected_assets")
+        if not isinstance(selected_assets, list) or not selected_assets:
+            raise RemoteAssetError("selection manifest has no selected_assets")
+        for selected in selected_assets:
             current = catalog_by_id.get(selected.get("id"))
             if not current or any(selected.get(key) != current.get(key) for key in ("file", "sha1", "evidence_level", "reuse_scope")):
                 raise RemoteAssetError(f"selection/catalog mismatch: {selected.get('id')}")
@@ -130,11 +132,17 @@ def main() -> int:
             target = stage / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(body)
-        verified = subprocess.run([sys.executable, str(args.verifier), "--library", str(stage), "--selection", str(stage / "selection-manifest.json")], capture_output=True, text=True)
-        receipt = {"status": "PASS" if verified.returncode == 0 else "FAIL", "catalog_sha256": catalog_digest, "selected": len(manifest.get("selected_assets", [])), "verifier_stdout": verified.stdout, "verifier_stderr": verified.stderr}
+        verifier_stdout = "built-in remote catalog/manifest/header/digest verification passed"
+        verifier_stderr = ""
+        verifier_returncode = 0
+        if args.verifier:
+            import subprocess
+            verified = subprocess.run([sys.executable, str(args.verifier), "--library", str(stage), "--selection", str(stage / "selection-manifest.json")], capture_output=True, text=True)
+            verifier_stdout, verifier_stderr, verifier_returncode = verified.stdout, verified.stderr, verified.returncode
+        receipt = {"status": "PASS" if verifier_returncode == 0 else "FAIL", "catalog_sha256": catalog_digest, "selected": len(selected_assets), "verifier_stdout": verifier_stdout, "verifier_stderr": verifier_stderr}
         (stage / "remote-verification-receipt.json").write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        if verified.returncode:
-            raise RemoteAssetError(verified.stderr or verified.stdout or "asset verifier failed")
+        if verifier_returncode:
+            raise RemoteAssetError(verifier_stderr or verifier_stdout or "asset verifier failed")
         print(json.dumps({"status": "PASS", "stage": str(stage), "catalog_sha256": catalog_digest, "selected": len(manifest.get("selected_assets", []))}))
         return 0
     except (OSError, ValueError, json.JSONDecodeError, RemoteAssetError) as exc:

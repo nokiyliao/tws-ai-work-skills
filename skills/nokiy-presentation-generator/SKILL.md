@@ -111,7 +111,7 @@ Read only what the task needs:
    (`shared-governance.md`):
 
    ```bash
-   PATH="$HOME/.local/bin:$PATH" uv run --with python-pptx python \
+   uv run --with python-pptx python \
      "${CODEX_HOME:-$HOME/.codex}/skills/nokiy-presentation-generator/scripts/qa_check.py" \
      final-deck.pptx --mode customer_facing --expect-slides 12 \
      --strict-zone --strict-overlap --strict-discouraged --strict-copy --min-font 10 \
@@ -120,6 +120,13 @@ Read only what the task needs:
       --asset-selection-manifest scratch/asset-selection.json] \
      [--locked-asset assets/xxx.png] [--asset-registry assets/registry.json] \
      [--rendered-dir rendered_slides --ocr-rendered] [--allow-video]
+
+   Render cross-platform before visual/OCR QA when the host has PowerPoint COM
+   or LibreOffice plus Poppler/PyMuPDF:
+
+   ```bash
+   python scripts/render_slides.py deck.pptx --output rendered_slides
+   ```
    ```
 
    It checks package integrity, slide count, editable text, banned/discouraged

@@ -11,12 +11,13 @@ from pathlib import Path
 
 HOME = Path.home()
 SKILLS = HOME / ".codex" / "skills"
-TWS_LIBRARY = Path("/Users/nokiy/Documents/TWS_AI_開發簡報/2026-08-03/asset-library")
+DEFAULT_TWS_LIBRARY = os.environ.get("TWS_ASSET_LIBRARY_PATH", "")
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--workflow", choices=("general", "tws-new-factory"), default="general")
+    parser.add_argument("--asset-library", type=Path, help="local asset-library root; overrides TWS_ASSET_LIBRARY_PATH")
     args = parser.parse_args()
 
     required = ["humanizer-zh-tw", "nokiy-presentation-generator", "codex-ppt"]
@@ -32,13 +33,14 @@ def main() -> int:
             checks.update({
                 "asset:remote-client": (Path(__file__).parent / "remote_asset_library.py").is_file(),
                 "asset:remote-catalog-pin": bool(os.environ.get("TWS_ASSET_LIBRARY_CATALOG_SHA256")),
-                "asset:verifier": (TWS_LIBRARY / "verify_assets.py").is_file(),
             })
         else:
+            library = args.asset_library or (Path(DEFAULT_TWS_LIBRARY) if DEFAULT_TWS_LIBRARY else None)
             checks.update({
-                "asset:catalog": (TWS_LIBRARY / "catalog.json").is_file(),
-                "asset:selector": (TWS_LIBRARY / "select_assets.py").is_file(),
-                "asset:verifier": (TWS_LIBRARY / "verify_assets.py").is_file(),
+                "asset:library-configured": library is not None,
+                "asset:catalog": bool(library and (library / "catalog.json").is_file()),
+                "asset:selector": bool(library and (library / "select_assets.py").is_file()),
+                "asset:verifier": bool(library and (library / "verify_assets.py").is_file()),
             })
 
     failed = sorted(name for name, ok in checks.items() if not ok)

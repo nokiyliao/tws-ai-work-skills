@@ -32,7 +32,7 @@ assign selected candidates to slides in the selection step.
 Run the mechanical gate first, on the final file:
 
 ```bash
-PATH="$HOME/.local/bin:$PATH" uv run --with python-pptx python \
+uv run --with python-pptx python \
   ~/.codex/skills/nokiy-presentation-generator/scripts/qa_check.py \
   <final>.pptx --mode customer_facing --expect-slides <N> \
   --strict-zone --strict-overlap --strict-discouraged --strict-copy --min-font 10 \
@@ -86,8 +86,10 @@ When the user provides a Markdown spec, annotated PPTX comment, or review text:
 Do not let export or Drive issues silently degrade the artifact. PDF handling
 applies only when the user explicitly requested PDF output:
 
-- If PowerPoint AppleScript PDF export times out, try a shorter temp path,
-  then fall back to high-resolution rendered slide images assembled into a PDF
+- Use `render_slides.py` with PowerPoint COM on Windows or LibreOffice on
+  Windows/macOS/Linux. macOS-native export remains acceptable when available.
+- If native PDF export times out, try a shorter temp path, then fall back to
+  high-resolution rendered slide images assembled into a PDF
   only if the user asked for a PDF deliverable — and say the PPTX remains the
   editable authority.
 - If the Drive connector upload/import returns 403, copy files into the local
