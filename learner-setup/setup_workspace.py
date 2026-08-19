@@ -18,6 +18,7 @@ EXPECTED_MANIFEST_KEYS = {
     "schemaVersion",
     "name",
     "version",
+    "workspaceLocation",
     "workspaceDirectory",
     "policy",
     "receipt",
@@ -64,6 +65,12 @@ def load_manifest(path: Path) -> dict[str, Any]:
         raise WorkspaceSetupError(
             "WORKSPACE_MANIFEST_SCHEMA",
             "unsupported schemaVersion or conflictPolicy",
+            manifest=str(path),
+        )
+    if data["workspaceLocation"] != "desktop":
+        raise WorkspaceSetupError(
+            "WORKSPACE_MANIFEST_SCHEMA",
+            "workspaceLocation must be desktop",
             manifest=str(path),
         )
 
@@ -114,8 +121,93 @@ def resolve_policy_source(manifest_path: Path, manifest: dict[str, Any], overrid
     return source, content
 
 
-def default_workspace(manifest: dict[str, Any]) -> Path:
-    return Path.home() / manifest["workspaceDirectory"]
+def windows_desktop_directory() -> Path:
+    try:
+        import ctypes
+        import uuid
+        from ctypes import wintypes
+
+        class GUID(ctypes.Structure):
+            _fields_ = [
+                ("Data1", wintypes.DWORD),
+                ("Data2", wintypes.WORD),
+                ("Data3", wintypes.WORD),
+                ("Data4", ctypes.c_ubyte * 8),
+            ]
+
+        desktop_guid = GUID.from_buffer_copy(
+            uuid.UUID("b4bfcc3a-db2c-424c-b029-7fe99a87c641").bytes_le
+        )
+        path_pointer = ctypes.c_wchar_p()
+        shell32 = ctypes.windll.shell32
+        shell32.SHGetKnownFolderPath.argtypes = [
+            ctypes.POINTER(GUID),
+            wintypes.DWORD,
+            wintypes.HANDLE,
+            ctypes.POINTER(ctypes.c_wchar_p),
+        ]
+        shell32.SHGetKnownFolderPath.restype = ctypes.c_long
+        result = shell32.SHGetKnownFolderPath(
+            ctypes.byref(desktop_guid),
+            0,
+            None,
+            ctypes.byref(path_pointer),
+        )
+        if result != 0:
+            raise OSError(f"SHGetKnownFolderPath failed: 0x{result & 0xFFFFFFFF:08x}")
+        try:
+            if not path_pointer.value:
+                raise OSError("SHGetKnownFolderPath returned an empty path")
+            return Path(path_pointer.value)
+        finally:
+            ole32 = ctypes.windll.ole32
+            ole32.CoTaskMemFree.argtypes = [ctypes.c_void_p]
+            ole32.CoTaskMemFree.restype = None
+            ole32.CoTaskMemFree(ctypes.cast(path_pointer, ctypes.c_void_p))
+    except WorkspaceSetupError:
+        raise
+    except Exception as exc:
+        raise WorkspaceSetupError(
+            "WORKSPACE_DESKTOP_RESOLUTION_FAILED",
+            str(exc),
+            platform=sys.platform,
+        ) from exc
+
+
+def desktop_directory(home: Path | None = None, platform: str | None = None) -> Path:
+    current_platform = platform if platform is not None else sys.platform
+    if current_platform == "win32":
+        return windows_desktop_directory()
+    if current_platform == "darwin":
+        return (home if home is not None else Path.home()) / "Desktop"
+    raise WorkspaceSetupError(
+        "WORKSPACE_DESKTOP_UNSUPPORTED",
+        f"desktop workspace is not supported on {current_platform}",
+        platform=current_platform,
+    )
+
+
+def default_workspace(
+    manifest: dict[str, Any],
+    home: Path | None = None,
+    platform: str | None = None,
+) -> Path:
+    return desktop_directory(home=home, platform=platform) / manifest["workspaceDirectory"]
+
+
+def legacy_workspace(manifest: dict[str, Any], home: Path | None = None) -> Path:
+    return (home if home is not None else Path.home()) / manifest["workspaceDirectory"]
+
+
+def guard_legacy_workspace(workspace: Path, manifest: dict[str, Any], home: Path | None = None) -> None:
+    legacy = legacy_workspace(manifest, home=home).absolute()
+    if legacy != workspace.absolute() and legacy.exists() and not workspace.exists():
+        raise WorkspaceSetupError(
+            "WORKSPACE_LEGACY_LOCATION_PRESENT",
+            "legacy workspace was preserved and the desktop workspace was not created",
+            legacyWorkspace=str(legacy),
+            targetWorkspace=str(workspace),
+        )
 
 
 def atomic_write(path: Path, content: bytes) -> None:
@@ -137,6 +229,7 @@ def expected_receipt(manifest: dict[str, Any]) -> dict[str, Any]:
     return {
         "schemaVersion": 1,
         "workspaceManifestVersion": manifest["version"],
+        "workspaceLocation": manifest["workspaceLocation"],
         "policy": {
             "target": manifest["policy"]["target"],
             "sha256": manifest["policy"]["sha256"],
@@ -248,6 +341,8 @@ def main(argv: list[str] | None = None) -> int:
             args.policy.expanduser().resolve() if args.policy else None,
         )
         workspace = (args.workspace.expanduser() if args.workspace else default_workspace(manifest)).absolute()
+        if args.workspace is None:
+            guard_legacy_workspace(workspace, manifest)
         result = (
             install_workspace(workspace, manifest, policy_content)
             if args.mode == "install"

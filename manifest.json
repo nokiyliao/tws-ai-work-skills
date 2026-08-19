@@ -1,6 +1,6 @@
 {
   "name": "TWS AI Work Skills",
-  "version": "2026.08.20.2",
+  "version": "2026.08.20.3",
   "skills": [
     "skills/nokiy-deck-orchestrator",
     "skills/tws-customer-proposal-pipeline",
@@ -30,6 +30,7 @@
     "policy": "learner-setup/AGENTS.md",
     "installer": "learner-setup/setup_workspace.py",
     "scope": "TWS_AI_Lab",
+    "location": "desktop",
     "conflictPolicy": "preserve-and-fail"
   },
   "excludedUntilValidated": [

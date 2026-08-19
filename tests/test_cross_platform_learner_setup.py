@@ -63,6 +63,12 @@ class CrossPlatformLearnerSetupTest(unittest.TestCase):
         self.assertIn("WORKSPACE_POLICY_CONFLICT", text)
         self.assertIn("不得寫入 home 根目錄或其他專案", text)
 
+    def test_workspace_setup_uses_windows_known_folder_api(self) -> None:
+        text = WORKSPACE_SETUP_PATH.read_text(encoding="utf-8")
+        self.assertIn("SHGetKnownFolderPath", text)
+        self.assertIn("b4bfcc3a-db2c-424c-b029-7fe99a87c641", text)
+        self.assertNotIn("%USERPROFILE%\\Desktop", text)
+
 
 if __name__ == "__main__":
     unittest.main()

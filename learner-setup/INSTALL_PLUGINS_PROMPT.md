@@ -23,10 +23,11 @@ https://raw.githubusercontent.com/nokiyliao/tws-ai-work-skills/main/learner-setu
     - https://raw.githubusercontent.com/nokiyliao/tws-ai-work-skills/main/learner-setup/workspace.manifest.json
     - https://raw.githubusercontent.com/nokiyliao/tws-ai-work-skills/main/learner-setup/setup_workspace.py
     - https://raw.githubusercontent.com/nokiyliao/tws-ai-work-skills/main/learner-setup/AGENTS.md
-12. 驗證規則檔 SHA-256 符合 workspace manifest，使用目前帳號的 home 建立 `TWS_AI_Lab`。
-13. 將核准的規則安裝為 `TWS_AI_Lab/AGENTS.md`。這份規則只適用於該課程工作區及其子資料夾，不得寫入 home 根目錄或其他專案。
+12. 驗證規則檔 SHA-256 符合 workspace manifest，在作業系統實際辨識的桌面建立 `TWS_AI_Lab`。Windows 必須使用 Known Folder API，支援 OneDrive 或公司重新導向；不得硬編碼 `%USERPROFILE%\Desktop`。
+13. 將核准的規則安裝為桌面 `TWS_AI_Lab/AGENTS.md`。這份規則只適用於該課程工作區及其子資料夾，不得寫入 home 根目錄或其他專案。
 14. 目標已有不同的 `AGENTS.md` 時保留原檔，停止工作區安裝並回報 `WORKSPACE_POLICY_CONFLICT`；不得靜默覆寫。
-15. 執行 `setup_workspace.py check`，只有 digest 與本機 receipt 全部通過才回報工作區完成。
+15. 發現舊版 home 根目錄 `TWS_AI_Lab` 時保留原位置，停止建立桌面副本並回報 `WORKSPACE_LEGACY_LOCATION_PRESENT`；不得搬移、合併或複製。
+16. 執行 `setup_workspace.py check`，只有桌面位置、digest 與本機 receipt 全部通過才回報工作區完成。
 
 除安裝清單內的外掛與建立 `TWS_AI_Lab` 外，不要修改我的 Skills、MCP、其他工作資料夾或既有登入設定。
 ```

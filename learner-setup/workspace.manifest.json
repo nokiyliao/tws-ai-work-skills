@@ -1,7 +1,8 @@
 {
   "schemaVersion": 1,
   "name": "TWS AI learner workspace",
-  "version": "2026.08.20.2",
+  "version": "2026.08.20.3",
+  "workspaceLocation": "desktop",
   "workspaceDirectory": "TWS_AI_Lab",
   "policy": {
     "source": "AGENTS.md",

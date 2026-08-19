@@ -16,7 +16,7 @@
 2. 從學習平台複製「課程環境一鍵建置」內容，貼到新的 Codex 任務。
 3. 確認 Codex 自動辨識 Windows，且沒有執行 macOS 路徑或指令。
 4. 確認 13 個外掛逐項回報「可使用／需要重啟／安裝失敗」，排除清單未被安裝。
-5. 確認 `%USERPROFILE%\TWS_AI_Lab\AGENTS.md` 已建立，digest 與 `workspace.manifest.json` 相符，本機 receipt 可通過驗證。
+5. 確認 Windows Known Folder API 實際回傳的桌面位置下已建立 `TWS_AI_Lab\AGENTS.md`；OneDrive 或公司重新導向有效，digest 與本機 receipt 可通過驗證。
 6. 確認 repository manifest 中的全部 Skills 已安裝，沒有複製 cookies、token、auth.json 或其他電腦的設定。
 7. 確認 runtime 位於 `%USERPROFILE%\.codex\runtimes\tws-ai`，依賴安裝於隔離環境。
 8. 確認 PowerPoint COM 或 LibreOffice 至少一種 renderer 通過。

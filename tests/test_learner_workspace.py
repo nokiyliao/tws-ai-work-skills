@@ -39,11 +39,26 @@ class LearnerWorkspaceTest(unittest.TestCase):
     def test_published_policy_matches_manifest_digest(self) -> None:
         self.assertEqual(self.manifest["policy"]["sha256"], SETUP.sha256_file(POLICY_PATH))
         self.assertEqual("preserve-and-fail", self.manifest["conflictPolicy"])
+        self.assertEqual("desktop", self.manifest["workspaceLocation"])
         self.assertNotIn("courseDirectories", self.manifest)
 
-    def test_default_workspace_is_scoped_to_current_user_project(self) -> None:
-        with mock.patch.object(Path, "home", return_value=Path("/home/student")):
-            self.assertEqual(Path("/home/student/TWS_AI_Lab"), SETUP.default_workspace(self.manifest))
+    def test_default_workspace_uses_current_macos_desktop(self) -> None:
+        self.assertEqual(
+            Path("/Users/student/Desktop/TWS_AI_Lab"),
+            SETUP.default_workspace(
+                self.manifest,
+                home=Path("/Users/student"),
+                platform="darwin",
+            ),
+        )
+
+    def test_default_workspace_uses_redirected_windows_known_folder(self) -> None:
+        desktop = Path("C:/Users/student/OneDrive/Desktop")
+        with mock.patch.object(SETUP, "windows_desktop_directory", return_value=desktop):
+            self.assertEqual(
+                desktop / "TWS_AI_Lab",
+                SETUP.default_workspace(self.manifest, platform="win32"),
+            )
 
     def test_install_creates_only_policy_and_receipt(self) -> None:
         result = SETUP.install_workspace(self.workspace, self.manifest, self.policy_content)
@@ -53,6 +68,7 @@ class LearnerWorkspaceTest(unittest.TestCase):
         self.assertEqual(self.policy_content, (self.workspace / "AGENTS.md").read_bytes())
         receipt = json.loads((self.workspace / self.manifest["receipt"]).read_text(encoding="utf-8"))
         self.assertEqual(SETUP.expected_receipt(self.manifest), receipt)
+        self.assertEqual("desktop", receipt["workspaceLocation"])
         self.assertEqual({"AGENTS.md", self.manifest["receipt"]}, {path.name for path in self.workspace.iterdir()})
 
     def test_repeated_install_is_idempotent(self) -> None:
@@ -91,6 +107,20 @@ class LearnerWorkspaceTest(unittest.TestCase):
         self.assertEqual("learner-setup/AGENTS.md", contract["policy"])
         self.assertEqual("learner-setup/setup_workspace.py", contract["installer"])
         self.assertEqual("TWS_AI_Lab", contract["scope"])
+        self.assertEqual("desktop", contract["location"])
+
+    def test_legacy_home_workspace_is_preserved_and_blocks_duplicate(self) -> None:
+        home = Path(self.temporary.name) / "student"
+        legacy = home / "TWS_AI_Lab"
+        target = home / "Desktop" / "TWS_AI_Lab"
+        legacy.mkdir(parents=True)
+
+        with self.assertRaises(SETUP.WorkspaceSetupError) as raised:
+            SETUP.guard_legacy_workspace(target, self.manifest, home=home)
+
+        self.assertEqual("WORKSPACE_LEGACY_LOCATION_PRESENT", raised.exception.blocker)
+        self.assertTrue(legacy.is_dir())
+        self.assertFalse(target.exists())
 
     def test_manifest_rejects_cross_platform_path_traversal(self) -> None:
         bad_manifest = dict(self.manifest)
