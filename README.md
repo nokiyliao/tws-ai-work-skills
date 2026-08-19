@@ -76,7 +76,7 @@ Restart ChatGPT after installation so the skills are available in new tasks.
 
 The repository publishes one versioned learner workspace contract:
 
-- [`learner-setup/workspace.manifest.json`](learner-setup/workspace.manifest.json) declares the workspace name, policy digest, course directories, receipt, and conflict policy.
+- [`learner-setup/workspace.manifest.json`](learner-setup/workspace.manifest.json) declares the workspace name, policy digest, receipt, and conflict policy.
 - [`learner-setup/AGENTS.md`](learner-setup/AGENTS.md) is the approved learner policy.
 - [`learner-setup/setup_workspace.py`](learner-setup/setup_workspace.py) installs or verifies the workspace with standard-library Python only.
 
@@ -172,4 +172,4 @@ RapidOCR engine nor a validated host engine is available.
 
 ## Version
 
-Current optimized release: `2026.08.20.1`.
+Current optimized release: `2026.08.20.2`.

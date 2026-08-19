@@ -20,7 +20,6 @@ EXPECTED_MANIFEST_KEYS = {
     "version",
     "workspaceDirectory",
     "policy",
-    "courseDirectories",
     "receipt",
     "conflictPolicy",
 }
@@ -69,20 +68,14 @@ def load_manifest(path: Path) -> dict[str, Any]:
         )
 
     policy = data["policy"]
-    directories = data["courseDirectories"]
     if not isinstance(policy, dict) or set(policy) != EXPECTED_POLICY_KEYS:
         raise WorkspaceSetupError("WORKSPACE_MANIFEST_SCHEMA", "invalid policy contract", manifest=str(path))
-    if not isinstance(directories, list) or not directories or not all(isinstance(item, str) and item for item in directories):
-        raise WorkspaceSetupError("WORKSPACE_MANIFEST_SCHEMA", "invalid courseDirectories", manifest=str(path))
-    if len(set(directories)) != len(directories):
-        raise WorkspaceSetupError("WORKSPACE_MANIFEST_SCHEMA", "duplicate courseDirectories", manifest=str(path))
 
     path_fields = [
         data["workspaceDirectory"],
         policy["source"],
         policy["target"],
         data["receipt"],
-        *directories,
     ]
     if not all(
         isinstance(item, str)
@@ -148,7 +141,6 @@ def expected_receipt(manifest: dict[str, Any]) -> dict[str, Any]:
             "target": manifest["policy"]["target"],
             "sha256": manifest["policy"]["sha256"],
         },
-        "courseDirectories": manifest["courseDirectories"],
     }
 
 
@@ -174,11 +166,6 @@ def validate_workspace(workspace: Path, manifest: dict[str, Any]) -> dict[str, A
             actualSha256=actual_digest,
         )
 
-    for directory_name in manifest["courseDirectories"]:
-        directory = workspace / directory_name
-        if directory.is_symlink() or not directory.is_dir():
-            raise WorkspaceSetupError("WORKSPACE_COURSE_DIRECTORY_MISSING", str(directory))
-
     receipt_path = workspace / manifest["receipt"]
     if receipt_path.is_symlink():
         raise WorkspaceSetupError("WORKSPACE_RECEIPT_SYMLINK", str(receipt_path))
@@ -197,7 +184,6 @@ def validate_workspace(workspace: Path, manifest: dict[str, Any]) -> dict[str, A
         "workspace": str(workspace),
         "policy": str(policy_target),
         "policySha256": actual_digest,
-        "courseDirectories": manifest["courseDirectories"],
         "receipt": str(receipt_path),
     }
 
@@ -229,17 +215,10 @@ def install_workspace(workspace: Path, manifest: dict[str, Any], policy_content:
             )
         action = "unchanged"
 
-    for directory_name in manifest["courseDirectories"]:
-        directory = workspace / directory_name
-        if directory.is_symlink() or (directory.exists() and not directory.is_dir()):
-            raise WorkspaceSetupError("WORKSPACE_COURSE_DIRECTORY_CONFLICT", str(directory))
     if receipt_path.is_symlink() or (receipt_path.exists() and not receipt_path.is_file()):
         raise WorkspaceSetupError("WORKSPACE_RECEIPT_CONFLICT", str(receipt_path))
 
     workspace.mkdir(parents=True, exist_ok=True)
-    for directory_name in manifest["courseDirectories"]:
-        directory = workspace / directory_name
-        directory.mkdir(exist_ok=True)
 
     if action == "installed":
         atomic_write(policy_target, policy_content)

@@ -39,21 +39,21 @@ class LearnerWorkspaceTest(unittest.TestCase):
     def test_published_policy_matches_manifest_digest(self) -> None:
         self.assertEqual(self.manifest["policy"]["sha256"], SETUP.sha256_file(POLICY_PATH))
         self.assertEqual("preserve-and-fail", self.manifest["conflictPolicy"])
+        self.assertNotIn("courseDirectories", self.manifest)
 
     def test_default_workspace_is_scoped_to_current_user_project(self) -> None:
         with mock.patch.object(Path, "home", return_value=Path("/home/student")):
             self.assertEqual(Path("/home/student/TWS_AI_Lab"), SETUP.default_workspace(self.manifest))
 
-    def test_install_creates_policy_course_directories_and_receipt(self) -> None:
+    def test_install_creates_only_policy_and_receipt(self) -> None:
         result = SETUP.install_workspace(self.workspace, self.manifest, self.policy_content)
 
         self.assertEqual("PASS", result["status"])
         self.assertEqual("installed", result["action"])
         self.assertEqual(self.policy_content, (self.workspace / "AGENTS.md").read_bytes())
-        for name in self.manifest["courseDirectories"]:
-            self.assertTrue((self.workspace / name).is_dir())
         receipt = json.loads((self.workspace / self.manifest["receipt"]).read_text(encoding="utf-8"))
         self.assertEqual(SETUP.expected_receipt(self.manifest), receipt)
+        self.assertEqual({"AGENTS.md", self.manifest["receipt"]}, {path.name for path in self.workspace.iterdir()})
 
     def test_repeated_install_is_idempotent(self) -> None:
         SETUP.install_workspace(self.workspace, self.manifest, self.policy_content)
@@ -73,7 +73,7 @@ class LearnerWorkspaceTest(unittest.TestCase):
 
         self.assertEqual("WORKSPACE_POLICY_CONFLICT", raised.exception.blocker)
         self.assertEqual(original, policy.read_bytes())
-        self.assertFalse((self.workspace / "course-01").exists())
+        self.assertFalse((self.workspace / self.manifest["receipt"]).exists())
 
     def test_check_detects_policy_tampering(self) -> None:
         SETUP.install_workspace(self.workspace, self.manifest, self.policy_content)
