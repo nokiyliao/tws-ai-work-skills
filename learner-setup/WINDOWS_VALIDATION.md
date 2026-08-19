@@ -16,12 +16,13 @@
 2. 從學習平台複製「課程環境一鍵建置」內容，貼到新的 Codex 任務。
 3. 確認 Codex 自動辨識 Windows，且沒有執行 macOS 路徑或指令。
 4. 確認 13 個外掛逐項回報「可使用／需要重啟／安裝失敗」，排除清單未被安裝。
-5. 確認 repository manifest 中的全部 Skills 已安裝，沒有複製 cookies、token、auth.json 或其他電腦的設定。
-6. 確認 runtime 位於 `%USERPROFILE%\.codex\runtimes\tws-ai`，依賴安裝於隔離環境。
-7. 確認 PowerPoint COM 或 LibreOffice 至少一種 renderer 通過。
-8. 確認 PPTX 建立、PDF／PNG 渲染、RapidOCR 與遠端素材 digest 驗證全部通過。
-9. 重新啟動 ChatGPT 後再次執行 check，結果仍為 PASS。
-10. 執行一個 Excel 任務與一個簡報任務，人工開啟成果確認中文字型、圖片、版面及可編輯性。
+5. 確認 `%USERPROFILE%\TWS_AI_Lab\AGENTS.md` 已建立，digest 與 `workspace.manifest.json` 相符，七個課程子資料夾存在。
+6. 確認 repository manifest 中的全部 Skills 已安裝，沒有複製 cookies、token、auth.json 或其他電腦的設定。
+7. 確認 runtime 位於 `%USERPROFILE%\.codex\runtimes\tws-ai`，依賴安裝於隔離環境。
+8. 確認 PowerPoint COM 或 LibreOffice 至少一種 renderer 通過。
+9. 確認 PPTX 建立、PDF／PNG 渲染、RapidOCR 與遠端素材 digest 驗證全部通過。
+10. 重新啟動 ChatGPT 後再次執行 check，結果仍為 PASS。
+11. 執行一個 Excel 任務與一個簡報任務，人工開啟成果確認中文字型、圖片、版面及可編輯性。
 
 ## 應記錄的失敗類型
 

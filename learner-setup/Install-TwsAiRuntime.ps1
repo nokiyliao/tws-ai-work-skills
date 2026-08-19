@@ -9,6 +9,7 @@ $ErrorActionPreference = "Stop"
 $MinimumPython = [Version]"3.10"
 $CodexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $HOME ".codex" }
 $Bootstrap = Join-Path $CodexHome "skills\nokiy-deck-orchestrator\scripts\runtime_bootstrap.py"
+$WorkspaceSetup = Join-Path $PSScriptRoot "setup_workspace.py"
 
 function Resolve-Python {
     $candidates = @(
@@ -35,10 +36,16 @@ function Resolve-Python {
 if (-not (Test-Path -LiteralPath $Bootstrap -PathType Leaf)) {
     throw "找不到已安裝的 nokiy-deck-orchestrator：$Bootstrap"
 }
+if (-not (Test-Path -LiteralPath $WorkspaceSetup -PathType Leaf)) {
+    throw "找不到學員工作區建置程式：$WorkspaceSetup"
+}
 
 $Python = Resolve-Python
 $PythonCommand = $Python[0]
 $PythonPrefix = if ($Python.Count -gt 1) { $Python[1..($Python.Count - 1)] } else { @() }
+
+& $PythonCommand @PythonPrefix $WorkspaceSetup $Mode.ToLowerInvariant()
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 # runtime_bootstrap can discover uv in PATH and standard per-user Windows paths.
 # If unavailable, install it only for the current Windows user.

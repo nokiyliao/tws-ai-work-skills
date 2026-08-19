@@ -1,6 +1,6 @@
 {
   "name": "TWS AI Work Skills",
-  "version": "2026.08.05.6",
+  "version": "2026.08.20.1",
   "skills": [
     "skills/nokiy-deck-orchestrator",
     "skills/tws-customer-proposal-pipeline",
@@ -24,6 +24,13 @@
       "tws-company": { "assetPolicy": "required", "customerIdentity": "optional" },
       "tws-new-factory": { "assetPolicy": "required", "customerIdentity": "required" }
     }
+  },
+  "learnerWorkspace": {
+    "manifest": "learner-setup/workspace.manifest.json",
+    "policy": "learner-setup/AGENTS.md",
+    "installer": "learner-setup/setup_workspace.py",
+    "scope": "TWS_AI_Lab",
+    "conflictPolicy": "preserve-and-fail"
   },
   "excludedUntilValidated": [
     "CAD drafting",

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "name": "TWS AI learner workspace",
+  "version": "2026.08.20.1",
+  "workspaceDirectory": "TWS_AI_Lab",
+  "policy": {
+    "source": "AGENTS.md",
+    "target": "AGENTS.md",
+    "sha256": "bf1b3950296e009886c2887afc783b0a91911b9308b23f1d4bbc0928ba3f3c28"
+  },
+  "courseDirectories": [
+    "course-01",
+    "course-02",
+    "course-03",
+    "course-04",
+    "course-05",
+    "course-06",
+    "course-07"
+  ],
+  "receipt": ".tws-ai-workspace.json",
+  "conflictPolicy": "preserve-and-fail"
+}

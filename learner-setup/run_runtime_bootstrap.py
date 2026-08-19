@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Platform-neutral launcher for the installed TWS AI runtime bootstrap.
+"""Platform-neutral launcher for the TWS learner workspace and runtime.
 
 This file contains no credentials and does not modify Codex configuration. It
-only locates the installed authoritative skill under the current user's home
-directory, verifies the minimum Python version, and delegates to that skill's
-runtime bootstrap.
+installs or verifies the repository-owned course workspace, then locates the
+installed authoritative skill under the current user's home directory and
+delegates to that skill's runtime bootstrap.
 """
 
 from __future__ import annotations
@@ -30,6 +30,10 @@ def bootstrap_path(home: Path | None = None) -> Path:
     return root / "skills" / "nokiy-deck-orchestrator" / "scripts" / "runtime_bootstrap.py"
 
 
+def workspace_setup_path() -> Path:
+    return Path(__file__).with_name("setup_workspace.py")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=("install", "check"), nargs="?", default="install")
@@ -44,6 +48,23 @@ def main() -> int:
             "platform": sys.platform,
         }, ensure_ascii=False))
         return 2
+
+    workspace_setup = workspace_setup_path()
+    if not workspace_setup.is_file():
+        print(json.dumps({
+            "status": "FAIL",
+            "blocker": "WORKSPACE_SETUP_MISSING",
+            "detail": str(workspace_setup),
+            "platform": sys.platform,
+        }, ensure_ascii=False))
+        return 3
+
+    workspace_completed = subprocess.run(
+        [sys.executable, str(workspace_setup), args.mode],
+        check=False,
+    )
+    if workspace_completed.returncode != 0:
+        return workspace_completed.returncode
 
     target = bootstrap_path()
     if not target.is_file():

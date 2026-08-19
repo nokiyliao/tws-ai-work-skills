@@ -5,6 +5,7 @@
 - macOS：已完成端到端驗證。
 - Windows 11：Skill、隔離 Python runtime、PowerPoint COM／LibreOffice 渲染及 RapidOCR 均有跨平台實作與自動測試；仍需在乾淨 Windows 帳號完成最終端到端驗收。
 - 學員請從課程平台複製一鍵建置內容。建置流程會依目前作業系統解析使用者目錄，不使用其他電腦的絕對路徑。
+- 建置流程會在目前帳號下建立 `TWS_AI_Lab`，並把核准的 `AGENTS.md` 放在工作區根目錄。規則不會寫入使用者 home 根目錄或其他專案。
 - Windows 人工驗收項目見 `learner-setup/WINDOWS_VALIDATION.md`。
 
 Codex skills for TWS customer proposals, editable presentation production, and Taiwan-local copy review.
@@ -41,7 +42,11 @@ Paste this into a new Codex task:
 請檢查每個 SKILL.md、資料夾結構與相依技能。若已有同名技能，比較版本並保留
 較新的內容；發現衝突時向我說明。
 
-安裝 Skill 後，請立刻執行跨平台 runtime bootstrap（不要要求我輸入素材庫路徑、
+請依 `learner-setup/workspace.manifest.json` 執行 `setup_workspace.py install` 與
+`setup_workspace.py check`。安裝器只可建立目前帳號的 `TWS_AI_Lab`；既有且 digest
+不同的 `TWS_AI_Lab/AGENTS.md` 必須保留，並回報 `WORKSPACE_POLICY_CONFLICT`。
+
+工作區驗證通過後，請執行跨平台 runtime bootstrap（不要要求我輸入素材庫路徑、
 hostname、token、Access 登入或本機素材路徑）：
 
 若缺少 Python 3.10+ 或 uv，請先由 Codex 安裝到使用者目錄；不得使用系統管理員
@@ -66,6 +71,19 @@ Microsoft Office / LibreOffice 等系統應用不得偽稱已自動安裝；
 ```
 
 Restart ChatGPT after installation so the skills are available in new tasks.
+
+## Learner workspace policy
+
+The repository publishes one versioned learner workspace contract:
+
+- [`learner-setup/workspace.manifest.json`](learner-setup/workspace.manifest.json) declares the workspace name, policy digest, course directories, receipt, and conflict policy.
+- [`learner-setup/AGENTS.md`](learner-setup/AGENTS.md) is the approved learner policy.
+- [`learner-setup/setup_workspace.py`](learner-setup/setup_workspace.py) installs or verifies the workspace with standard-library Python only.
+
+The default target is `~/TWS_AI_Lab` on macOS and `%USERPROFILE%\TWS_AI_Lab`
+on Windows. Codex applies the root `AGENTS.md` recursively while a learner works
+inside that project. The installer never writes `~/AGENTS.md`, never changes
+unrelated projects, and preserves an existing policy when its digest differs.
 
 ## Install the learner plugins
 
@@ -154,4 +172,4 @@ RapidOCR engine nor a validated host engine is available.
 
 ## Version
 
-Current optimized release: `2026.08.05.6`.
+Current optimized release: `2026.08.20.1`.
