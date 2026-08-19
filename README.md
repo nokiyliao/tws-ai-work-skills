@@ -58,6 +58,20 @@ Microsoft Office / LibreOffice 等系統應用不得偽稱已自動安裝；
 
 Restart ChatGPT after installation so the skills are available in new tasks.
 
+## Install the learner plugins
+
+The learner plugin package installs or enables 13 course plugins that do not
+require an external account login. It explicitly excludes Google Drive, Gmail,
+Outlook Email, GitHub, Cloudflare, and the three private UTM/test-workspace
+plugins. It contains identifiers and setup instructions only;
+credentials, OAuth tokens, plugin caches, and personal configuration are never
+included.
+
+Open [`learner-setup/INSTALL_PLUGINS_PROMPT.md`](learner-setup/INSTALL_PLUGINS_PROMPT.md),
+copy the prompt into a new Codex task, and follow any restart or local permission
+instructions Codex reports. The authoritative machine-readable list is
+[`learner-setup/plugins.manifest.json`](learner-setup/plugins.manifest.json).
+
 ## Presentation routing
 
 `nokiy-deck-orchestrator` is the only user-facing entry point for creating,

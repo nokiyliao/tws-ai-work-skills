@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "name": "TWS AI learner plugins",
+  "updatedAt": "2026-08-19",
+  "policy": {
+    "installAllListed": true,
+    "copyLocalCache": false,
+    "copyCredentials": false,
+    "requireUserApprovalForOAuth": true,
+    "continueAfterRestart": true
+  },
+  "plugins": [
+    { "id": "browser@openai-bundled", "name": "Browser", "channel": "bundled", "observedVersion": "26.814.41407", "requiresAuth": false },
+    { "id": "chrome@openai-bundled", "name": "Chrome", "channel": "bundled", "observedVersion": "26.814.41407", "requiresAuth": false },
+    { "id": "computer-use@openai-bundled", "name": "Computer Use", "channel": "bundled", "observedVersion": "1.0.1000761", "requiresAuth": false },
+    { "id": "sites@openai-bundled", "name": "Sites", "channel": "bundled", "observedVersion": "0.1.37", "requiresAuth": false },
+    { "id": "visualize@openai-bundled", "name": "Visualize", "channel": "bundled", "observedVersion": "1.0.21", "requiresAuth": false },
+
+    { "id": "documents@openai-primary-runtime", "name": "Documents", "channel": "primary-runtime", "observedVersion": "26.818.11542", "requiresAuth": false },
+    { "id": "spreadsheets@openai-primary-runtime", "name": "Spreadsheets", "channel": "primary-runtime", "observedVersion": "26.818.11542", "requiresAuth": false },
+    { "id": "presentations@openai-primary-runtime", "name": "Presentations", "channel": "primary-runtime", "observedVersion": "26.818.11542", "requiresAuth": false },
+    { "id": "pdf@openai-primary-runtime", "name": "PDF", "channel": "primary-runtime", "observedVersion": "26.818.11542", "requiresAuth": false },
+    { "id": "template-creator@openai-primary-runtime", "name": "Template Creator", "channel": "primary-runtime", "observedVersion": "26.818.11542", "requiresAuth": false },
+
+    { "id": "data-analytics@openai-curated-remote", "name": "Data Analytics", "channel": "curated-remote", "observedVersion": "0.2.8-13ceeea1f599", "requiresAuth": false },
+    { "id": "plugin-management@openai-curated-remote", "name": "Plugin Management", "channel": "curated-remote", "observedVersion": "0.1.0", "requiresAuth": false },
+    { "id": "sales@openai-curated-remote", "name": "Sales", "channel": "curated-remote", "observedVersion": "1.1.0", "requiresAuth": false }
+  ],
+  "excluded": [
+    { "id": "cloudflare@openai-curated-remote", "reason": "Requires an external Cloudflare account authorization" },
+    { "id": "github@openai-curated-remote", "reason": "Requires an external GitHub account authorization" },
+    { "id": "gmail@openai-curated-remote", "reason": "Requires an external Google account authorization" },
+    { "id": "google-drive@openai-curated-remote", "reason": "Requires an external Google account authorization" },
+    { "id": "outlook-email@openai-curated-remote", "reason": "Requires account authorization and cannot connect to the current Exchange account" },
+    { "id": "dev-6a5b6fb0f94c8191b27ebe6c43f5829a", "reason": "Private UTM 9013 workspace access" },
+    { "id": "dev-6a5b6d970d688191bce3beab6fc13d66", "reason": "Private UTM 9013 read-only research access" },
+    { "id": "dev-6a5b68938dd48191a822f0fb908c585f", "reason": "Private isolated test workspace" }
+  ]
+}
