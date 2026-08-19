@@ -2,6 +2,11 @@
   "schemaVersion": 1,
   "name": "TWS AI learner plugins",
   "updatedAt": "2026-08-19",
+  "supportedPlatforms": ["macos", "windows"],
+  "validation": {
+    "macos": "verified",
+    "windows": "implementation-ready; end-to-end validation pending"
+  },
   "policy": {
     "installAllListed": true,
     "copyLocalCache": false,

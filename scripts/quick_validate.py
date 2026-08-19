@@ -33,9 +33,13 @@ REQUIRED = [
     ROOT / "skills/nokiy-deck-orchestrator/runtime/requirements.txt",
     ROOT / "skills/nokiy-deck-orchestrator/runtime/pyproject.toml",
     ROOT / "tests/test_runtime_bootstrap.py",
+    ROOT / "tests/test_cross_platform_learner_setup.py",
     ROOT / "tests/test_learner_bootstrap.py",
     ROOT / "tests/test_skill_routing.py",
     ROOT / "tests/test_visual_plan.py",
+    ROOT / "learner-setup/run_runtime_bootstrap.py",
+    ROOT / "learner-setup/Install-TwsAiRuntime.ps1",
+    ROOT / "learner-setup/WINDOWS_VALIDATION.md",
     ROOT / "README.md",
     ROOT / "manifest.json",
 ]

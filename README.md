@@ -1,5 +1,12 @@
 # TWS AI Work Skills
 
+## 學員環境相容性
+
+- macOS：已完成端到端驗證。
+- Windows 11：Skill、隔離 Python runtime、PowerPoint COM／LibreOffice 渲染及 RapidOCR 均有跨平台實作與自動測試；仍需在乾淨 Windows 帳號完成最終端到端驗收。
+- 學員請從課程平台複製一鍵建置內容。建置流程會依目前作業系統解析使用者目錄，不使用其他電腦的絕對路徑。
+- Windows 人工驗收項目見 `learner-setup/WINDOWS_VALIDATION.md`。
+
 Codex skills for TWS customer proposals, editable presentation production, and Taiwan-local copy review.
 
 ## Included skills
@@ -40,7 +47,9 @@ hostname、token、Access 登入或本機素材路徑）：
 若缺少 Python 3.10+ 或 uv，請先由 Codex 安裝到使用者目錄；不得使用系統管理員
 權限，也不得污染全域 site-packages。
 
-python ~/.codex/skills/nokiy-deck-orchestrator/scripts/runtime_bootstrap.py install
+請依目前作業系統解析使用者 Codex 目錄並執行 runtime_bootstrap.py install。
+Windows 可使用 py、python 或 learner-setup/Install-TwsAiRuntime.ps1；macOS 可使用
+python3。不得直接套用另一個作業系統的路徑格式。
 
 此指令會：
 1. 偵測 Windows/macOS、Python、uv
@@ -109,17 +118,26 @@ the origin filesystem remains loopback-only and is never exposed. See
 Deck production Python packages install into an isolated runtime, never the
 global interpreter:
 
-- Default path: `~/.codex/runtimes/tws-ai` (override with `TWS_AI_RUNTIME_HOME`)
+- Default path: current user's `.codex/runtimes/tws-ai` (override with `TWS_AI_RUNTIME_HOME`)
 - Declaration: `skills/nokiy-deck-orchestrator/runtime/requirements.txt`
 - Lockfile: `skills/nokiy-deck-orchestrator/runtime/requirements.lock`
 - Packages: `python-pptx`, `Pillow`, `PyMuPDF`, `RapidOCR`, `ONNX Runtime`, and Windows-only `pywin32`
 
 Bootstrap and verify:
 
+macOS：
+
 ```bash
-python skills/nokiy-deck-orchestrator/scripts/runtime_bootstrap.py install
-python skills/nokiy-deck-orchestrator/scripts/runtime_bootstrap.py check
-python skills/nokiy-deck-orchestrator/scripts/preflight.py --workflow tws-new-factory
+python3 skills/nokiy-deck-orchestrator/scripts/runtime_bootstrap.py install
+python3 skills/nokiy-deck-orchestrator/scripts/runtime_bootstrap.py check
+python3 skills/nokiy-deck-orchestrator/scripts/preflight.py --workflow tws-new-factory
+```
+
+Windows PowerShell：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File learner-setup/Install-TwsAiRuntime.ps1 -Mode Install
+powershell -ExecutionPolicy Bypass -File learner-setup/Install-TwsAiRuntime.ps1 -Mode Check
 ```
 
 ### System applications (not auto-installed)

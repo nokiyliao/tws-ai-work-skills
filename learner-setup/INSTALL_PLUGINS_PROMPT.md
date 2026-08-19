@@ -1,6 +1,6 @@
 # TWS AI 課程外掛建置 Prompt
 
-將以下內容貼到新的 Codex 任務。Codex 會依 manifest 檢查 13 個不需外部帳號登入的外掛，安裝或啟用缺少項目。
+將以下內容貼到新的 Codex 任務。Codex 會自動辨識 macOS 或 Windows，依 manifest 檢查 13 個不需外部帳號登入的外掛，安裝或啟用缺少項目。
 
 ```text
 請建置 TWS AI 課程的學員外掛環境。
@@ -18,6 +18,7 @@ https://raw.githubusercontent.com/nokiyliao/tws-ai-work-skills/main/learner-setu
 7. 若安裝後需要重新啟動 ChatGPT，保存待辦清單並告訴我重新啟動；重新啟動後繼續驗證。
 8. 最後依序驗證外掛是否可被 Codex 發現，輸出「可使用／需要重啟／安裝失敗」三類結果。
 9. 個別外掛失敗時繼續檢查其他項目，最後集中列出失敗原因與人工處理方式。
+10. Windows 與 macOS 都必須使用目前使用者帳號的標準 Codex 目錄，不得硬編碼其他作業系統的路徑或指令。
 
 不要修改我的 Skills、MCP、工作資料夾或既有登入設定。
 ```
