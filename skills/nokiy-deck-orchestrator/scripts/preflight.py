@@ -112,9 +112,30 @@ def flatten_runtime_bools(runtime: dict[str, Any]) -> dict[str, bool]:
     return checks
 
 
+def classify_failures(failed: list[str], blockers: list[dict[str, Any]]) -> dict[str, list[str]]:
+    """Separate package defects from self-service and IT-managed blockers."""
+    admin_checks = {str(item.get("check")) for item in blockers if item.get("admin_or_gui")}
+    result = {
+        "repository_or_install": [],
+        "automatic_bootstrap": [],
+        "local_it_or_permission": [],
+    }
+    for name in failed:
+        short = name.removeprefix("runtime:")
+        if name.startswith("skill:") or name in {
+            "asset:remote-client", "asset:remote-base-url", "asset:remote-catalog-pin"
+        }:
+            result["repository_or_install"].append(name)
+        elif short in admin_checks or name == "runtime:renderer":
+            result["local_it_or_permission"].append(name)
+        else:
+            result["automatic_bootstrap"].append(name)
+    return result
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--workflow", choices=("general", "tws-company", "tws-new-factory"), default="general")
+    parser.add_argument("--workflow", choices=("general", "tws-company", "tws-customer", "tws-new-factory"), default="general")
     parser.add_argument(
         "--asset-mode",
         choices=("remote", "local"),
@@ -137,7 +158,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     required = ["humanizer-zh-tw", "nokiy-presentation-generator", "codex-ppt"]
-    if args.workflow == "tws-new-factory":
+    if args.workflow in {"tws-customer", "tws-new-factory"}:
         required.append("tws-customer-proposal-pipeline")
 
     checks: dict[str, bool] = {
@@ -146,7 +167,7 @@ def main(argv: list[str] | None = None) -> int:
     }
     details: dict[str, Any] = {"skills_root": str(SKILLS)}
 
-    if args.workflow in {"tws-company", "tws-new-factory"}:
+    if args.workflow in {"tws-company", "tws-customer", "tws-new-factory"}:
         if args.asset_mode == "remote":
             has_base_url, has_catalog_pin = remote_configured()
             checks.update(
@@ -218,6 +239,7 @@ def main(argv: list[str] | None = None) -> int:
         "failed": failed,
         "runtime": runtime_detail,
         "blockers": runtime_blockers,
+        "resolution": classify_failures(failed, runtime_blockers),
         "details": details,
     }
     print(json.dumps(report, indent=2, ensure_ascii=True))

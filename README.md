@@ -63,7 +63,7 @@ python3。不得直接套用另一個作業系統的路徑格式。
 2. 在使用者可控的隔離位置建立 runtime（預設 ~/.codex/runtimes/tws-ai）
 3. 依 runtime/requirements.lock 安裝簡報套件與 RapidOCR/ONNX Runtime（Windows 另含 pywin32）
 4. 跑最小 smoke：可開啟 PPTX、渲染/產生一頁 PNG、驗證 OCR engine
-5. 執行遠端素材 bootstrap_learner 與 tws-new-factory remote preflight
+5. 執行遠端素材 bootstrap_learner 與 tws-customer remote preflight
 
 Python 與 uv 可由 Codex 安裝到使用者目錄；不要污染全域 site-packages。
 Microsoft Office / LibreOffice 等系統應用不得偽稱已自動安裝；
@@ -112,8 +112,9 @@ passing `deck_pipeline_state.py route` guard. The routing contract is declared
 in `manifest.json` and validated by the repository test suite.
 
 TWS company, capability, product, and teaching decks use the `tws-company`
-workflow; named-customer and new-factory proposals use `tws-new-factory`. Both
-routes require the remote selection manifest, digest verification, a per-slide
+workflow. Named-customer proposals without a case record use `tws-customer`;
+database-backed new-factory cases use `tws-new-factory`. All TWS routes require
+the remote selection manifest, digest verification, a per-slide
 visual plan, and post-build proof that planned images are embedded on the
 declared slides. The Markdown converter is limited to non-TWS internal drafts.
 
@@ -176,4 +177,4 @@ RapidOCR engine nor a validated host engine is available.
 
 ## Version
 
-Current optimized release: `2026.08.20.3`.
+Current optimized release: `2026.08.20.4`.

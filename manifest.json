@@ -1,6 +1,6 @@
 {
   "name": "TWS AI Work Skills",
-  "version": "2026.08.20.3",
+  "version": "2026.08.20.4",
   "skills": [
     "skills/nokiy-deck-orchestrator",
     "skills/tws-customer-proposal-pipeline",
@@ -22,7 +22,8 @@
     "workflows": {
       "general": { "assetPolicy": "optional", "customerIdentity": "optional" },
       "tws-company": { "assetPolicy": "required", "customerIdentity": "optional" },
-      "tws-new-factory": { "assetPolicy": "required", "customerIdentity": "required" }
+      "tws-customer": { "assetPolicy": "required", "customerIdentity": "required", "leadId": "optional" },
+      "tws-new-factory": { "assetPolicy": "required", "customerIdentity": "required", "leadId": "required" }
     }
   },
   "learnerWorkspace": {

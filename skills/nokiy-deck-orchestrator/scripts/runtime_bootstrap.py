@@ -764,7 +764,7 @@ def run_remote_bootstrap(config_path: Path | None = None, *, skip: bool = False)
     }
 
 
-def run_preflight_script(workflow: str = "tws-new-factory", *, skip: bool = False) -> dict[str, Any]:
+def run_preflight_script(workflow: str = "tws-customer", *, skip: bool = False) -> dict[str, Any]:
     if skip:
         return {"ok": True, "skipped": True, "blocker": None, "detail": "skipped"}
     preflight = SCRIPT_DIR / "preflight.py"

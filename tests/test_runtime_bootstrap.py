@@ -32,6 +32,15 @@ PF = load_module("tws_preflight_test", PREFLIGHT_PATH)
 
 
 class RuntimeDiscoveryTest(unittest.TestCase):
+    def test_preflight_classifies_repo_bootstrap_and_it_failures(self) -> None:
+        result = PF.classify_failures(
+            ["skill:codex-ppt", "runtime:imports", "runtime:renderer"],
+            [{"check": "renderer", "admin_or_gui": True}],
+        )
+        self.assertEqual(result["repository_or_install"], ["skill:codex-ppt"])
+        self.assertEqual(result["automatic_bootstrap"], ["runtime:imports"])
+        self.assertEqual(result["local_it_or_permission"], ["runtime:renderer"])
+
     def test_platform_and_python_gates(self) -> None:
         self.assertEqual(RB.detect_platform("Darwin")["family"], "macos")
         self.assertEqual(RB.detect_platform("Windows")["family"], "windows")

@@ -48,6 +48,7 @@ PREREQUISITES = {
 }
 ENTRY_SKILL = "nokiy-deck-orchestrator"
 ROUTABLE_PHASES = ("proposal", "copy", "visual_plan", "sample", "build", "visual_qa", "mechanical_qa")
+TWS_WORKFLOWS = {"tws-company", "tws-customer", "tws-new-factory"}
 TWS_ASSET_PHASES = {"asset_selection", "asset_verification", "visual_plan"}
 
 
@@ -107,7 +108,7 @@ def phase_ok(state: dict, phase: str) -> bool:
     status = state["phases"][phase]["status"]
     if status == "pass":
         return True
-    if state.get("workflow") in {"tws-company", "tws-new-factory"} and phase in TWS_ASSET_PHASES:
+    if state.get("workflow") in TWS_WORKFLOWS and phase in TWS_ASSET_PHASES:
         return False
     if status == "skipped" and phase in {
         "case_lock", "proposal", "asset_selection", "asset_verification", "visual_plan",
@@ -147,21 +148,26 @@ def cmd_init(args: argparse.Namespace) -> int:
     path = state_path(str(run_dir))
     if path.exists() and not args.force:
         raise SystemExit(f"state file already exists: {path}")
-    named_customer = args.workflow == "tws-new-factory"
-    tws = args.workflow in {"tws-company", "tws-new-factory"}
-    if named_customer and (not args.lead_id or not args.customer_name or not args.input):
+    customer_proposal = args.workflow in {"tws-customer", "tws-new-factory"}
+    case_bound = args.workflow == "tws-new-factory"
+    tws = args.workflow in TWS_WORKFLOWS
+    if customer_proposal and not args.customer_name:
+        raise SystemExit(f"{args.workflow} requires --customer-name")
+    if case_bound and (not args.lead_id or not args.input):
         raise SystemExit("tws-new-factory requires --lead-id, --customer-name, and --input")
     input_path = Path(args.input).expanduser().resolve() if args.input else None
     if input_path and not input_path.exists():
         raise SystemExit(f"input file not found: {input_path}")
-    input_data = validate_tws_input(input_path, args.lead_id, args.customer_name, args.mode) if named_customer else {}
+    input_data = validate_tws_input(input_path, args.lead_id, args.customer_name, args.mode) if case_bound else {}
     sample_status = "skipped" if args.mode == "revision" else "pending"
     pdf_status = "pending" if args.pdf_requested else "skipped"
-    named_only = {"case_lock", "proposal", "deploy", "register", "readback"}
+    case_only = {"case_lock", "deploy", "register", "readback"}
     asset_required = {"asset_selection", "asset_verification", "visual_plan"}
     skipped_for_workflow = set()
-    if not named_customer:
-        skipped_for_workflow.update(named_only)
+    if not case_bound:
+        skipped_for_workflow.update(case_only)
+    if not customer_proposal:
+        skipped_for_workflow.add("proposal")
     if not tws:
         skipped_for_workflow.update(asset_required)
     state = {
@@ -204,7 +210,7 @@ def cmd_set(args: argparse.Namespace) -> int:
     path, state = load(args.run_dir)
     if (
         args.status == "skipped"
-        and state.get("workflow") in {"tws-company", "tws-new-factory"}
+        and state.get("workflow") in TWS_WORKFLOWS
         and args.phase in TWS_ASSET_PHASES
     ):
         raise SystemExit(f"cannot skip required TWS asset phase: {args.phase}")
@@ -232,10 +238,12 @@ def cmd_set(args: argparse.Namespace) -> int:
 def completion_errors(state: dict, target: str) -> list[str]:
     errors = []
     required = ["source", "outline", "copy", "build", "visual_qa", "mechanical_qa"]
-    if state.get("workflow") in {"tws-company", "tws-new-factory"}:
+    if state.get("workflow") in TWS_WORKFLOWS:
         required += ["asset_selection", "asset_verification", "visual_plan"]
+    if state.get("workflow") in {"tws-customer", "tws-new-factory"}:
+        required += ["proposal"]
     if state.get("workflow") == "tws-new-factory":
-        required += ["case_lock", "proposal"]
+        required += ["case_lock"]
         if target == "publish":
             required += ["deploy", "register", "readback"]
     for phase in required:
@@ -294,7 +302,7 @@ def parser() -> argparse.ArgumentParser:
     init = commands.add_parser("init")
     init.add_argument("--run-dir", required=True)
     init.add_argument("--mode", choices=("editable", "image", "revision"), default="editable")
-    init.add_argument("--workflow", choices=("general", "tws-company", "tws-new-factory"), default="general")
+    init.add_argument("--workflow", choices=("general", "tws-company", "tws-customer", "tws-new-factory"), default="general")
     init.add_argument("--job-id")
     init.add_argument("--lead-id")
     init.add_argument("--customer-name")

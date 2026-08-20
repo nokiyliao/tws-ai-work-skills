@@ -1,4 +1,4 @@
 interface:
   display_name: "做簡報"
   short_description: "建立、修改、檢查與發布 TWS 客戶簡報的統一管線"
-  default_prompt: "請從唯一簡報入口開始處理這個任務：TWS 公司簡介用 tws-company，具名客戶提案用 tws-new-factory；先做 runtime preflight 並建立 orchestrator run state，再依序完成文案、遠端素材選取與驗證、逐頁 visual plan、可編輯建置、視覺與機械 QA，不得直接跳到子技能或用 Markdown 快速建置 TWS 正式簡報。"
+  default_prompt: "請從唯一簡報入口開始處理這個任務：TWS 公司簡介用 tws-company，具名客戶提案用 tws-customer，具有案件 ID 或新廠資料庫紀錄時才用 tws-new-factory。若 runtime 缺少可由目前使用者安裝的元件，直接執行 bootstrap install 並重跑 preflight；只有 Office／LibreOffice、公司政策或系統管理員權限等無法自行排除的項目才向使用者回報。建立 orchestrator run state 後，依序完成文案、遠端素材選取與驗證、逐頁 visual plan、可編輯建置、視覺與機械 QA，不得直接跳到子技能或用 Markdown 快速建置 TWS 正式簡報。"

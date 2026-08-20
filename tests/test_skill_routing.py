@@ -59,6 +59,8 @@ class SkillMetadataRoutingTest(unittest.TestCase):
         self.assertEqual(routing["stateContract"], "tws_deck_routing_v2")
         self.assertEqual(len(routing["internalPresentationPhases"]), 3)
         self.assertEqual(routing["workflows"]["tws-company"]["assetPolicy"], "required")
+        self.assertEqual(routing["workflows"]["tws-customer"]["leadId"], "optional")
+        self.assertEqual(routing["workflows"]["tws-new-factory"]["leadId"], "required")
 
     def test_only_orchestrator_claims_complete_presentation_requests(self) -> None:
         entry = frontmatter_description("nokiy-deck-orchestrator")
@@ -125,6 +127,32 @@ class DelegationGuardTest(unittest.TestCase):
             )
             with self.assertRaisesRegex(SystemExit, "cannot skip required TWS asset phase"):
                 STATE.cmd_set(skip_args)
+
+    def test_named_customer_without_case_id_uses_customer_workflow(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            run_dir = Path(temp) / "customer"
+            args = Namespace(
+                run_dir=str(run_dir), mode="editable", workflow="tws-customer",
+                job_id=None, lead_id=None, customer_name="統一企業股份有限公司", input=None,
+                source=[], pdf_requested=False, force=False,
+            )
+            self.assertEqual(STATE.cmd_init(args), 0)
+            state = json.loads((run_dir / "deck_pipeline_state.json").read_text(encoding="utf-8"))
+            self.assertEqual(state["lead_id"], "")
+            self.assertEqual(state["phases"]["case_lock"]["status"], "skipped")
+            self.assertEqual(state["phases"]["proposal"]["status"], "pending")
+            for phase in ("asset_selection", "asset_verification", "visual_plan"):
+                self.assertEqual(state["phases"][phase]["status"], "pending")
+
+    def test_new_factory_still_requires_case_identity(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            args = Namespace(
+                run_dir=str(Path(temp) / "factory"), mode="editable", workflow="tws-new-factory",
+                job_id=None, lead_id=None, customer_name="統一企業股份有限公司", input=None,
+                source=[], pdf_requested=False, force=False,
+            )
+            with self.assertRaisesRegex(SystemExit, "requires --lead-id"):
+                STATE.cmd_init(args)
 
     def test_general_workflow_skips_tws_asset_phases(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

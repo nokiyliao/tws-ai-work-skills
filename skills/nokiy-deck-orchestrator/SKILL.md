@@ -26,18 +26,20 @@ calls to this orchestrator:
 
 Classify every TWS/TWSC/奔騰物流 company introduction, capability deck, product
 deck, teaching deck, or generic brand presentation as `tws-company`. Classify a
-named-customer, case-ID, or new-factory proposal as `tws-new-factory`. Use
-`general` only when the deck is genuinely unrelated to TWS. Both TWS workflows
+named-customer proposal without a verified case record as `tws-customer`.
+Use `tws-new-factory` only when a case ID, lead ID, or new-factory database
+record exists. Use `general` only when the deck is genuinely unrelated to TWS. All TWS workflows
 require remote asset selection, digest verification, and a per-slide visual
 plan; those phases may never be skipped. Ask for customer identity only for
-`tws-new-factory`, and only when it cannot be resolved from the case database or
-provided files.
+`tws-customer` or `tws-new-factory`, and only when it cannot be resolved from
+provided files or the case database. Do not ask for a case ID when the request
+is a normal named-customer proposal.
 
 Coordinate the presentation pipeline. Do not duplicate or weaken the delegated
 skills. Keep the source authority, copy lock, visual acceptance, and mechanical
 acceptance as separate gates.
 
-For a TWS new-factory or named-customer proposal, this skill is the only
+For a TWS customer or new-factory proposal, this skill is the only
 authorized entry point. A delegated skill that receives a request for a
 complete TWS deck must return control here. Delegated skills cannot publish,
 register, or declare the complete task successful.
@@ -82,13 +84,22 @@ python scripts/runtime_bootstrap.py install
 python scripts/runtime_bootstrap.py check
 ```
 
+If `check` reports a missing isolated runtime, uv, Python packages, PyMuPDF,
+RapidOCR, or ONNX Runtime, do not stop at a dependency report. Run `install`
+once and then run `check` again. On Windows prefer
+`learner-setup/Install-TwsAiRuntime.ps1 -Mode Install`; it installs uv for the
+current user when needed. Only stop for a typed blocker that requires a system
+application, company policy change, administrator approval, or an unavailable
+network service.
+
 `install` creates the isolated runtime, installs lockfile packages (never
 global site-packages), runs PPTX/PNG/OCR smoke tests, then remote
 `bootstrap_learner.py` and preflight. Office/LibreOffice are not auto-installed;
 missing system rendering tools fail closed with typed blockers.
 
-Run `scripts/preflight.py --workflow tws-company` for a generic TWS deck, or
-`--workflow tws-new-factory` for a named-customer job. Preflight checks skills,
+Run `scripts/preflight.py --workflow tws-company` for a generic TWS deck,
+`--workflow tws-customer` for a normal named-customer proposal, or
+`--workflow tws-new-factory` for a database-backed new-factory job. Preflight checks skills,
 remote asset config, and real runtime
 imports/renderer/rasterizer/OCR, and prints machine-readable JSON. Company
 learner mode is remote by default and uses administrator-injected service
@@ -104,8 +115,10 @@ credential. Local maintenance is documented separately in
 
 ## TWS Authority Contract
 
-- Resolve the formal customer name from the case record identified by
-  `lead_id`. A prompt alias or speech transcription cannot replace it.
+- For `tws-new-factory`, resolve the formal customer name from the case record
+  identified by `lead_id`. A prompt alias or speech transcription cannot
+  replace it. For `tws-customer`, verify the company name from the user's source
+  or an authoritative public source and store the source in the run directory.
 - Preserve the input snapshot, proposal content, selection manifest,
   verification receipt, build manifest, QA reports, deployment receipt, and
   readback evidence in one job directory.
@@ -154,7 +167,7 @@ Choose one build mode. Do not mix final assembly engines.
 - `revision`: patch only the user-authorized slides or objects. Preserve all
   untouched content and locked assets.
 
-For `tws-company` and `tws-new-factory`, the Markdown fast builder is forbidden
+For `tws-company`, `tws-customer`, and `tws-new-factory`, the Markdown fast builder is forbidden
 as a final assembly engine. It may be used only for a non-TWS `general` internal
 draft. TWS final decks must consume the verified visual plan and use the
 editable builder or the explicitly accepted image mode.
@@ -166,15 +179,17 @@ to the rendered PPTX; do not use its image-only assembly engine.
 ## Mandatory Pipeline
 
 1. Initialize run state with `scripts/deck_pipeline_state.py init`. Generic TWS
-   company/capability decks use `--workflow tws-company`. Named-customer jobs
-   use `--workflow tws-new-factory` with `--lead-id`, `--customer-name`, and
-   `--input`.
+   company/capability decks use `--workflow tws-company`. A named-customer job
+   without a case record uses `--workflow tws-customer --customer-name`.
+   A database-backed new-factory job uses `--workflow tws-new-factory` with
+   `--lead-id`, `--customer-name`, and `--input`.
 2. Read sources and establish authority. Use `pdf` for PDF extraction and page
    rendering. Do not create a PDF output unless the user asks in the current
    request.
-3. Lock the case identity and route named-customer content strategy through
-   `tws-customer-proposal-pipeline`. Record the customer profile, deck
-   requirements, proposal content, and source notes as evidence.
+3. Route customer content strategy through `tws-customer-proposal-pipeline`.
+   Lock case identity only for `tws-new-factory`. For `tws-customer`, preserve
+   the authoritative company-name source instead. Record the customer profile,
+   deck requirements, proposal content, and source notes as evidence.
 4. Run the Humanizer gate before layout:
    - Review every model-authored title, visible label, table cell, diagram node,
      footer, closing line, and new speaker note.
@@ -183,7 +198,7 @@ to the rendered PPTX; do not use its image-only assembly engine.
      silently rewrite them.
    - Save the accepted copy and mark the `copy` phase passed. No build may start
      from draft copy.
-5. For either TWS workflow, call the remote asset client, create the selection
+5. For every TWS workflow, call the remote asset client, create the selection
    manifest, and preserve its PASS verification receipt. Then create one
    `tws_deck_visual_plan_v1` entry per slide, including official asset IDs,
    generated-concept prompts, or editable diagram/data specifications. Run:
@@ -255,7 +270,16 @@ python scripts/deck_pipeline_state.py init \
 
 Record real evidence files. Chat statements are not completion evidence.
 
-TWS initialization:
+Named-customer initialization without a database case:
+
+```bash
+python scripts/deck_pipeline_state.py init \
+  --run-dir <job-dir> --workflow tws-customer --mode editable \
+  --customer-name <formal-name> --source <brief-or-authority-source>
+python scripts/deck_pipeline_state.py check --run-dir <job-dir> --target build
+```
+
+Database-backed new-factory initialization:
 
 ```bash
 python scripts/deck_pipeline_state.py init \

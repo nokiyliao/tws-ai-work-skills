@@ -144,8 +144,10 @@ Required pass phases: `source`, `outline`, `copy`, `build`, `visual_qa`, and
 `mechanical_qa`. `sample` must be `pass` or an allowed `skipped`; `pdf` must be
 `pass` when requested and `skipped` otherwise.
 
-Both TWS workflows require `asset_selection`, `asset_verification`, and
-`visual_plan`. Named-customer `tws-new-factory` acceptance also requires
-`case_lock` and `proposal`. Platform publication additionally requires `deploy`,
+All TWS workflows require `asset_selection`, `asset_verification`, and
+`visual_plan`. Customer proposal workflows require `proposal`; database-backed
+`tws-new-factory` acceptance also requires `case_lock`. A normal
+`tws-customer` proposal must not invent or require a lead ID.
+Platform publication for a database-backed case additionally requires `deploy`,
 `register`, and `readback`. Readback evidence binds the released PPTX digest to
 the Mini file, database row, and platform download.
